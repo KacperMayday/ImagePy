@@ -2,7 +2,7 @@ import copy
 import logging
 import os
 import time
-from tkinter import Event, Label, Toplevel
+import tkinter as tk
 
 from PIL import Image, ImageTk
 
@@ -11,7 +11,7 @@ from utils.constants import ZoomEnum
 logger = logging.getLogger(__name__)
 
 
-class ImageWindow(Toplevel):
+class ImageWindow(tk.Toplevel):
     def __init__(self, image: Image, source_path: str | None = None):
         super().__init__()
         self.source_path: str = source_path
@@ -23,8 +23,9 @@ class ImageWindow(Toplevel):
         self.mode: str = self.is_gray(self.image)
         self.window_id: str = self.calculate_window_id()
         self.default_file_name: str = 'Duplicated'
-        self.img_label = Label(master=self)
-        self.img_label.pack()
+        self._img = None  # this is needed only to keep canvas image away from garbage collector
+        self.img_canvas = tk.Canvas(master=self)
+        self.img_canvas.pack()
         self.update_image(self.image)
 
         self.window_title = self.source_path
@@ -35,14 +36,6 @@ class ImageWindow(Toplevel):
 
     @staticmethod
     def is_gray(img: Image) -> str:
-        # if len(img.shape) < 3 or img.shape[2] == 1:
-        #     return True
-        #
-        # b, g, r = img[:, :, 0], img[:, :, 1], img[:, :, 2]
-        # if (b == g).all() and (b == r).all():
-        #     return True
-        #
-        # return False
         return img.mode
 
     @staticmethod
@@ -61,7 +54,7 @@ class ImageWindow(Toplevel):
     def window_title(self) -> str:
         return f'{self.window_id} ' \
                f'{os.path.split(self.source_path)[-1] if self.source_path else self.default_file_name} ' \
-               f'{int(self.zoom_options[self.current_resize]*100)}%'
+               f'{int(self.zoom_options[self.current_resize] * 100)}%'
 
     @window_title.setter
     def window_title(self, source_path: str | None = None):
@@ -74,13 +67,13 @@ class ImageWindow(Toplevel):
         self.refresh_display_image()
 
     def refresh_display_image(self):
-        img = ImageTk.PhotoImage(self.displayed_image)
-        self.img_label.configure(image=img)
-        self.img_label.image = img
+        self._img = ImageTk.PhotoImage(self.displayed_image)
+        self.img_canvas.config(height=self._img.height(), width=self._img.width())
+        self.img_canvas.create_image(0, 0, image=self._img, anchor=tk.NW)
         self.window_title = self.source_path
 
-    def resize(self, resize_event: Event):
-        self.current_resize += resize_event.delta // 120
+    def resize(self, resize_event: tk.Event):
+        self.current_resize -= resize_event.delta // 120
         if self.current_resize < 0:
             self.current_resize = 0
         elif self.current_resize >= len(self.zoom_options):
