@@ -48,7 +48,8 @@ def save_file_as(source_window: ImageWindow, extract_path: bool = False) -> None
     if not save_path:
         save_path = fd.asksaveasfilename(**default_ask_save_params)
     elif not extract_path:
-        save_path = fd.asksaveasfilename(**default_ask_save_params, initialdir=os.path.split(save_path)[0])
+        save_path = fd.asksaveasfilename(**default_ask_save_params, initialdir=os.path.split(save_path)[0],
+                                         initialfile=os.path.split(save_path)[1])
 
     if save_path and save_image(image_to_save, save_path):
         source_window.window_title = save_path

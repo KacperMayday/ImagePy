@@ -1,9 +1,12 @@
+import copy
 import logging
 import os
 import time
-from tkinter import Label, Toplevel
+from tkinter import Event, Label, Toplevel
 
 from PIL import Image, ImageTk
+
+from utils.constants import ZoomEnum
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +16,10 @@ class ImageWindow(Toplevel):
         super().__init__()
         self.source_path: str = source_path
         self.image: Image = image
+        self.displayed_image = copy.deepcopy(image)
+        self.zoom_options = [ZoomEnum.ZOOM_10, ZoomEnum.ZOOM_20, ZoomEnum.ZOOM_25, ZoomEnum.ZOOM_50, ZoomEnum.ZOOM_100,
+                             ZoomEnum.ZOOM_150, ZoomEnum.ZOOM_200]
+        self.current_resize = self.zoom_options.index(ZoomEnum.ZOOM_100)
         self.mode: str = self.is_gray(self.image)
         self.window_id: str = self.calculate_window_id()
         self.default_file_name: str = 'Duplicated'
@@ -24,6 +31,7 @@ class ImageWindow(Toplevel):
         self.focus_set()
         self.bind("<FocusIn>", lambda _: ImageManager.set_focus(self))
         self.bind('<Destroy>', lambda _: ImageManager.set_focus(None))
+        self.bind('<Control-MouseWheel>', self.resize)
 
     @staticmethod
     def is_gray(img: Image) -> str:
@@ -51,7 +59,9 @@ class ImageWindow(Toplevel):
 
     @property
     def window_title(self) -> str:
-        return f'{self.window_id} {os.path.split(self.source_path)[-1] if self.source_path else self.default_file_name}'
+        return f'{self.window_id} ' \
+               f'{os.path.split(self.source_path)[-1] if self.source_path else self.default_file_name} ' \
+               f'{int(self.zoom_options[self.current_resize]*100)}%'
 
     @window_title.setter
     def window_title(self, source_path: str | None = None):
@@ -60,9 +70,26 @@ class ImageWindow(Toplevel):
 
     def update_image(self, image: Image):
         self.image = image
-        img = ImageTk.PhotoImage(self.image)
+        self.displayed_image = copy.deepcopy(self.image)
+        self.refresh_display_image()
+
+    def refresh_display_image(self):
+        img = ImageTk.PhotoImage(self.displayed_image)
         self.img_label.configure(image=img)
         self.img_label.image = img
+        self.window_title = self.source_path
+
+    def resize(self, resize_event: Event):
+        self.current_resize += resize_event.delta // 120
+        if self.current_resize < 0:
+            self.current_resize = 0
+        elif self.current_resize >= len(self.zoom_options):
+            self.current_resize = len(self.zoom_options) - 1
+
+        resize_scale = self.zoom_options[self.current_resize]
+        self.displayed_image = self.image.resize(
+            (round(self.image.width * resize_scale), round(self.image.height * resize_scale)), Image.ANTIALIAS)
+        self.refresh_display_image()
 
 
 class ImageManager:
