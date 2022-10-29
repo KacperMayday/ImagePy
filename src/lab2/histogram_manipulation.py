@@ -60,14 +60,14 @@ class LinearAdjustmentWidget(tk.Toplevel):
         self.lower_boundary_variable.trace('w', self.update_threshold)
         self.higher_boundary_variable.trace('w', self.update_threshold)
 
-        self.percent_frame = tk.Frame(self.frame)
-        tk.Label(self.percent_frame, text="Procent przesycenia %: ").pack()
-        slider_percent = SliderWidget(self.percent_frame, initial_value=MIN_INTENSITY_LEVEL, slider_length=100,
-                                      max_intensity_level=100)
-        self.percent = slider_percent.slider_variable
-
-        slider_percent.pack()
-        self.percent_frame.pack()
+        # self.percent_frame = tk.Frame(self.frame)
+        # tk.Label(self.percent_frame, text="Procent przesycenia %: ").pack()
+        # slider_percent = SliderWidget(self.percent_frame, initial_value=MIN_INTENSITY_LEVEL, slider_length=100,
+        #                               max_intensity_level=100)
+        # self.percent = slider_percent.slider_variable
+        #
+        # slider_percent.pack()
+        # self.percent_frame.pack()
 
         self.reset_button = tk.Button(self.frame, text='Reset', command=self.reset_image)
         self.reset_button.pack()
@@ -99,7 +99,7 @@ class LinearAdjustmentWidget(tk.Toplevel):
 
     def reset_image(self):
         self.image_window.update_image(self.image)
-        self.percent.set(0)
+        # self.percent.set(0)
         for child in self.histogram_canvas.lines:
             self.histogram_canvas.delete(child)
 
@@ -210,13 +210,12 @@ class GammaCorrectionWidget(tk.Toplevel):
                                   column=2,
                                   sticky='NW')
         self.percent = slider_percent.slider_variable
-        self.percent.trace('w', self.gamma_correction_calc)
         slider_percent.pack()
         self.percent_frame.pack()
 
         self.reset_button = tk.Button(self.frame, text='Reset', command=self.reset_image)
         self.reset_button.pack()
-        self.close_button = tk.Button(self.frame, text='Apply', command=self.destroy)
+        self.close_button = tk.Button(self.frame, text='Apply', command=self.gamma_correction_calc)
         self.close_button.pack()
         self.frame.pack()
 
@@ -237,7 +236,7 @@ class GammaCorrectionWidget(tk.Toplevel):
                                    max_intensity_value: int = MAX_INTENSITY_LEVEL) -> int:
         return round(((pixel_value / max_intensity_value) ** (1 / gamma_coefficient)) * MAX_INTENSITY_LEVEL)
 
-    def gamma_correction_calc(self, _a, _b, _c):
+    def gamma_correction_calc(self, _a=None, _b=None, _c=None):
         image = self.image
 
         gamma_coefficient = self.percent.get()
