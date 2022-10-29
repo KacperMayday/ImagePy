@@ -3,7 +3,7 @@ import tkinter as tk
 
 from debug.debug import create_debug_menu
 from lab1.histogram import show_histogram
-from lab2.histogram_manipulation import histogram_equalization
+from lab2.histogram_manipulation import gamma_correction, histogram_equalization, linear_adjustment
 from lab2.negation import invert_image
 from lab2.threshold import threshold_filter
 from utils.image_manager import ImageManager
@@ -45,6 +45,13 @@ def create_menu(root: tk.Toplevel | tk.Tk) -> tk.Menu:
     process_menu.add_command(label="Histogram equalization",
                              command=lambda: histogram_equalization(ImageManager.get_focus_window()),
                              font=custom_font)
+    process_menu.add_command(label="Linear adjustment",
+                             command=lambda: linear_adjustment(ImageManager.get_focus_window()),
+                             font=custom_font)
+    process_menu.add_command(label="Gamma correction",
+                             command=lambda: gamma_correction(ImageManager.get_focus_window()),
+                             font=custom_font)
+    process_menu.add_separator()
     process_menu.add_command(label="Image Calculator", command=not_implemented, font=custom_font)
     menubar.add_cascade(label="Process", menu=process_menu)
 

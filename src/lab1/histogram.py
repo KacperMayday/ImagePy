@@ -46,6 +46,7 @@ class HistogramCanvas(tk.Canvas):
         self.pixel_count = tk.StringVar(value=f'Count: ---')
         self.pixel_value = tk.StringVar(value=f'Value: ---')
         self.border_offset = highlight_thickness
+        self.lines = []
 
         self.bind('<Motion>', self.set_histogram_string_vars)
 
@@ -63,12 +64,13 @@ class HistogramCanvas(tk.Canvas):
 
     def plot_histogram(self):
         for intensity_level in range(self.width + 1):
-            self.create_line(intensity_level + self.border_offset,
-                             self.height,
-                             intensity_level + self.border_offset,
-                             self.height - ((self.histogram_dict[intensity_level] / self.max_pixel_count) * self.height
-                                            if intensity_level in self.histogram_dict else MIN_INTENSITY_LEVEL),
-                             fill=self.colour)
+            self.lines.append(self.create_line(intensity_level + self.border_offset,
+                                               self.height,
+                                               intensity_level + self.border_offset,
+                                               self.height - ((self.histogram_dict[
+                                                                   intensity_level] / self.max_pixel_count) * self.height
+                                                              if intensity_level in self.histogram_dict else MIN_INTENSITY_LEVEL),
+                                               fill=self.colour))
 
 
 class HistogramStatisticsFrame(ttk.Frame):
