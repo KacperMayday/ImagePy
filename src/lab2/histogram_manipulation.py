@@ -60,7 +60,11 @@ def linear_adjustment(image: Image) -> list[int] | list[tuple[int, int, int]]:
     return list_of_pixels
 
 
-def histogram_equalization(image: Image) -> list[int] | list[tuple[int, int, int]]:
+def histogram_equalization(image_window: ImageWindow):
+    if not image_window:
+        return None
+
+    image = image_window.image
     list_of_pixels = list(image.getdata())
     histogram = HistogramWidget.count_values(image)
     max_intensity_level = MAX_INTENSITY_LEVEL + 1
@@ -74,7 +78,9 @@ def histogram_equalization(image: Image) -> list[int] | list[tuple[int, int, int
     list_of_pixels = [(histogram_cumulative_distributor[p] - hcd_min) * (max_intensity_level - 1) // (dim - hcd_min)
                       for p in list_of_pixels]
 
-    return list_of_pixels
+    inverted_image = Image.new(image.mode, image.size)
+    inverted_image.putdata(list_of_pixels)
+    image_window.update_image(inverted_image)
 
 
 def calculate_gamma_adjustment(pixel_value: int, gamma_coefficient: float,

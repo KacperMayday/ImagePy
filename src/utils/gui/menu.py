@@ -3,7 +3,7 @@ import tkinter as tk
 
 from debug.debug import create_debug_menu
 from lab1.histogram import show_histogram
-from lab2.histogram_manipulation import gui_mock
+from lab2.histogram_manipulation import histogram_equalization
 from lab2.negation import invert_image
 from lab2.threshold import threshold_filter
 from utils.image_manager import ImageManager
@@ -42,7 +42,8 @@ def create_menu(root: tk.Toplevel | tk.Tk) -> tk.Menu:
     menubar.add_cascade(label="Image", menu=edit_menu)
 
     process_menu = tk.Menu(menubar, tearoff=0)
-    process_menu.add_command(label="Histogram manipulation", command=lambda: gui_mock(ImageManager.get_focus_window()),
+    process_menu.add_command(label="Histogram equalization",
+                             command=lambda: histogram_equalization(ImageManager.get_focus_window()),
                              font=custom_font)
     process_menu.add_command(label="Image Calculator", command=not_implemented, font=custom_font)
     menubar.add_cascade(label="Process", menu=process_menu)
