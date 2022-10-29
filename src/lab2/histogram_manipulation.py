@@ -23,7 +23,7 @@ class LinearAdjustmentWidget(tk.Toplevel):
     def __init__(self, source_image_window: ImageWindow):
         super(LinearAdjustmentWidget, self).__init__()
         self.title(source_image_window.window_title)
-        self.geometry('350x400')
+        self.geometry('350x500')
         self.pack_propagate(False)
         self.image_window = source_image_window
         self.image = source_image_window.image
@@ -37,20 +37,65 @@ class LinearAdjustmentWidget(tk.Toplevel):
         gradient_bar = GradientBar(root=self.frame, height=10, colour_iterator=ColourIterator(colour))
         gradient_bar.pack()
 
+        self.lower_boundary_line = self.histogram_canvas.create_line(self.histogram_canvas.border_offset,
+                                                                     self.histogram_canvas.border_offset,
+                                                                     self.histogram_canvas.border_offset,
+                                                                     self.histogram_max_height + self.histogram_canvas.border_offset,
+                                                                     fill='red')
+        slider_lower_boundary = SliderWidget(self.frame, initial_value=MIN_INTENSITY_LEVEL)
+        self.lower_boundary_variable = slider_lower_boundary.slider_variable
+        slider_lower_boundary.pack()
+
+        self.higher_boundary_line = self.histogram_canvas.create_line(
+            MAX_INTENSITY_LEVEL + self.histogram_canvas.border_offset,
+            self.histogram_canvas.border_offset,
+            MAX_INTENSITY_LEVEL + self.histogram_canvas.border_offset,
+            self.histogram_max_height + self.histogram_canvas.border_offset,
+            fill='red')
+        slider_higher_boundary = SliderWidget(self.frame, initial_value=MAX_INTENSITY_LEVEL)
+        self.higher_boundary_variable = slider_higher_boundary.slider_variable
+        slider_higher_boundary.pack()
+        self.filters = [[self.lower_boundary_variable, 'lower'],
+                        [self.higher_boundary_variable, 'higher']]
+        self.lower_boundary_variable.trace('w', self.update_threshold)
+        self.higher_boundary_variable.trace('w', self.update_threshold)
+
         self.percent_frame = tk.Frame(self.frame)
         tk.Label(self.percent_frame, text="Procent przesycenia %: ").pack()
         slider_percent = SliderWidget(self.percent_frame, initial_value=MIN_INTENSITY_LEVEL, slider_length=100,
                                       max_intensity_level=100)
         self.percent = slider_percent.slider_variable
-        self.percent.trace('w', self.linear_adjustment)
+
         slider_percent.pack()
         self.percent_frame.pack()
 
         self.reset_button = tk.Button(self.frame, text='Reset', command=self.reset_image)
         self.reset_button.pack()
-        self.close_button = tk.Button(self.frame, text='Apply', command=self.destroy)
+        self.close_button = tk.Button(self.frame, text='Apply', command=self.linear_adjustment)
         self.close_button.pack()
         self.frame.pack()
+
+    def update_threshold(self, var: str | None = None, _b=None, _c=None):
+        if self.lower_boundary_variable.get() > self.higher_boundary_variable.get():
+            active_filter = None
+            for f in self.filters:
+                if var == f[0]._name:
+                    active_filter = f[1]
+            if active_filter == 'higher':
+                self.lower_boundary_variable.set(self.higher_boundary_variable.get())
+            elif active_filter == 'lower':
+                self.higher_boundary_variable.set(self.lower_boundary_variable.get())
+
+        self.histogram_canvas.coords(self.lower_boundary_line,
+                                     self.lower_boundary_variable.get() + self.histogram_canvas.border_offset,
+                                     self.histogram_canvas.border_offset,
+                                     self.lower_boundary_variable.get() + self.histogram_canvas.border_offset,
+                                     self.histogram_max_height + self.histogram_canvas.border_offset)
+        self.histogram_canvas.coords(self.higher_boundary_line,
+                                     self.higher_boundary_variable.get() + self.histogram_canvas.border_offset,
+                                     self.histogram_canvas.border_offset,
+                                     self.higher_boundary_variable.get() + self.histogram_canvas.border_offset,
+                                     self.histogram_max_height + self.histogram_canvas.border_offset)
 
     def reset_image(self):
         self.image_window.update_image(self.image)
@@ -65,29 +110,29 @@ class LinearAdjustmentWidget(tk.Toplevel):
         self.histogram_canvas.plot_histogram()
 
     @staticmethod
-    def calculate_linear_adjustment(pixel_value: int, min_value: int, max_value: int) -> int:
-        if pixel_value < min_value:
-            return MIN_INTENSITY_LEVEL
-        elif pixel_value > max_value:
-            return MAX_INTENSITY_LEVEL
-        else:
-            if max_value == min_value:
-                return pixel_value
-            return (pixel_value - min_value) * MAX_INTENSITY_LEVEL // (max_value - min_value)
+    def calculate_linear_adjustment(pixel_value: int, min_in: int, max_in: int, min_out: int, max_out: int) -> int:
+        if max_in == min_in:
+            return pixel_value
+        # return (pixel_value - min_in) * MAX_INTENSITY_LEVEL // (max_in - min_in)
+        return round((pixel_value - min_in) * (((max_out - min_out) / (max_in - min_in)) + min_out))
 
-    def linear_adjustment(self, _a, _b, _c):
+    def linear_adjustment(self, _a=None, _b=None, _c=None):
         image = self.image
         list_of_pixels = list(image.getdata())
-        stretch_threshold_coefficient = max(int(self.percent.get()) / 100, 0) if isinstance(self.percent.get(),
-                                                                                            int) else 0
-        threshold = round(stretch_threshold_coefficient * len(list_of_pixels))
+        # stretch_threshold_coefficient = max(int(self.percent.get()) / 100, 0) if isinstance(self.percent.get(),
+        #                                                                                     int) else 0
+        # threshold = round(stretch_threshold_coefficient * len(list_of_pixels))
+        min_in = min(list_of_pixels)
+        max_in = max(list_of_pixels)
+        min_out = self.lower_boundary_variable.get()
+        max_out = self.higher_boundary_variable.get()
         match image.mode:
             case ImageModeEnum.GREYSCALE:
-                sorted_list = sorted(list_of_pixels)
-                max_value = max(sorted_list[:-threshold if threshold != 0 else -1])
-                min_value = min(sorted_list[threshold:])
-                list_of_pixels = [self.calculate_linear_adjustment(i, min_value, max_value) for i in
-                                  list_of_pixels]
+                # sorted_list = sorted(list_of_pixels)
+                # max_value = max(sorted_list[:-threshold if threshold != 0 else -1])
+                # min_value = min(sorted_list[threshold:])
+                list_of_pixels = [self.calculate_linear_adjustment(i, min_in, max_in, min_out, max_out)
+                                  for i in list_of_pixels]
             case _:
                 logger.error(ValueError('Niepoprawny format obrazu!'))
 
