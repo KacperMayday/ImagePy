@@ -1,7 +1,7 @@
 import logging
 import tkinter as tk
 
-from utils.gui.menu import create_menu
+from src.utils.gui.menu import create_menu
 
 logger = logging.getLogger(__name__)
 

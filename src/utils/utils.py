@@ -4,8 +4,8 @@ from tkinter import filedialog as fd
 
 from PIL import Image, UnidentifiedImageError
 
-from utils.constants import ColourEnum, FILE_TYPES, MAX_INTENSITY_LEVEL
-from utils.image_manager import ImageWindow
+from src.utils.constants import ColourEnum, FILE_TYPES, MAX_INTENSITY_LEVEL
+from src.utils.image_manager import ImageWindow
 
 logger = logging.getLogger(__name__)
 

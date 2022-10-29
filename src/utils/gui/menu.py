@@ -1,13 +1,13 @@
 import logging
 import tkinter as tk
 
-from debug.debug import create_debug_menu
-from lab1.histogram import show_histogram
-from lab2.histogram_manipulation import gamma_correction, histogram_equalization, linear_adjustment
-from lab2.negation import invert_image
-from lab2.threshold import threshold_filter
-from utils.image_manager import ImageManager
-from utils.utils import duplicate_image, open_file, save_file_as
+from src.debug.debug import create_debug_menu
+from src.lab1.histogram import show_histogram
+from src.lab2.histogram_manipulation import gamma_correction, histogram_equalization, linear_adjustment
+from src.lab2.negation import invert_image
+from src.lab2.threshold import threshold_filter
+from src.utils.image_manager import ImageManager
+from src.utils.utils import duplicate_image, open_file, save_file_as
 
 logger = logging.getLogger(__name__)
 

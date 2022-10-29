@@ -1,7 +1,7 @@
 import logging
 from tkinter import Menu
 
-from utils.image_manager import ImageManager
+from src.utils.image_manager import ImageManager
 
 logger = logging.getLogger(__name__)
 

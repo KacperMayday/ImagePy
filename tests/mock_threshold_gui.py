@@ -2,8 +2,8 @@ import tkinter as tk
 
 from PIL import Image
 
-from lab1.histogram import show_histogram
-from utils.image_manager import ImageWindow
+from src.lab1.histogram import show_histogram
+from src.utils.image_manager import ImageWindow
 
 
 def main():

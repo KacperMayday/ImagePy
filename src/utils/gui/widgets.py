@@ -2,8 +2,8 @@ import logging
 import math
 import tkinter as tk
 
-from utils.constants import MAX_INTENSITY_LEVEL, MIN_INTENSITY_LEVEL
-from utils.utils import ColourIterator
+from src.utils.constants import MAX_INTENSITY_LEVEL, MIN_INTENSITY_LEVEL
+from src.utils.utils import ColourIterator
 
 logger = logging.getLogger(__name__)
 

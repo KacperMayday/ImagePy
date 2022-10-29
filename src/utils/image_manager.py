@@ -7,7 +7,7 @@ from tkinter import ttk
 
 from PIL import Image, ImageTk
 
-from utils.constants import ZoomEnum
+from src.utils.constants import ZoomEnum
 
 logger = logging.getLogger(__name__)
 

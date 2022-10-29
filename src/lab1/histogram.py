@@ -6,10 +6,10 @@ from tkinter import ttk
 
 from PIL import Image
 
-from utils.constants import ColourEnum, ImageModeEnum, MAX_INTENSITY_LEVEL, MIN_INTENSITY_LEVEL
-from utils.gui.widgets import GradientBar
-from utils.image_manager import ImageWindow
-from utils.utils import ColourIterator
+from src.utils.constants import ColourEnum, ImageModeEnum, MAX_INTENSITY_LEVEL, MIN_INTENSITY_LEVEL
+from src.utils.gui.widgets import GradientBar
+from src.utils.image_manager import ImageWindow
+from src.utils.utils import ColourIterator
 
 logger = logging.getLogger(__name__)
 

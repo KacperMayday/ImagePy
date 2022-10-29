@@ -1,10 +1,10 @@
 import tkinter as tk
 
-from lab1.histogram import HistogramCanvas, HistogramWidget
-from utils.constants import ColourEnum, ImageModeEnum, MAX_INTENSITY_LEVEL, MIN_INTENSITY_LEVEL
-from utils.gui.widgets import GradientBar, SliderWidget
-from utils.image_manager import ImageWindow
-from utils.utils import ColourIterator
+from src.lab1.histogram import HistogramCanvas, HistogramWidget
+from src.utils.constants import ColourEnum, ImageModeEnum, MAX_INTENSITY_LEVEL, MIN_INTENSITY_LEVEL
+from src.utils.gui.widgets import GradientBar, SliderWidget
+from src.utils.image_manager import ImageWindow
+from src.utils.utils import ColourIterator
 
 
 def threshold_filter(image_window: ImageWindow) -> None:

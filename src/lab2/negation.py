@@ -2,8 +2,8 @@ import logging
 
 from PIL import Image
 
-from utils.constants import ImageModeEnum, MAX_INTENSITY_LEVEL
-from utils.image_manager import ImageWindow
+from src.utils.constants import ImageModeEnum, MAX_INTENSITY_LEVEL
+from src.utils.image_manager import ImageWindow
 
 logger = logging.getLogger(__name__)
 
