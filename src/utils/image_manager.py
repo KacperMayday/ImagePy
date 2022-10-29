@@ -19,7 +19,7 @@ class ImageWindow(tk.Toplevel):
         self.image: Image = image
         self.displayed_image = copy.deepcopy(image)
         self.zoom_options = [ZoomEnum.ZOOM_10, ZoomEnum.ZOOM_20, ZoomEnum.ZOOM_25, ZoomEnum.ZOOM_50, ZoomEnum.ZOOM_100,
-                             ZoomEnum.ZOOM_150, ZoomEnum.ZOOM_200]
+                             ZoomEnum.ZOOM_150, ZoomEnum.ZOOM_200, ZoomEnum.ZOOM_FULL]
         self.current_resize = self.zoom_options.index(ZoomEnum.ZOOM_100)
         self.mode: str = self.is_gray(self.image)
         self.window_id: str = self.calculate_window_id()
@@ -42,7 +42,7 @@ class ImageWindow(tk.Toplevel):
         self.bind("<FocusIn>", lambda _: ImageManager.set_focus(self))
         self.bind('<Destroy>', lambda _: ImageManager.set_focus(None))
         self.bind('<Control-MouseWheel>', self.resize)
-        self.bind('<MouseWheel>', lambda e: self.img_canvas.yview_scroll(-1*(e.delta//120), "units"))
+        self.bind('<MouseWheel>', lambda e: self.img_canvas.yview_scroll(-1 * (e.delta // 120), "units"))
 
     @staticmethod
     def is_gray(img: Image) -> str:
@@ -62,9 +62,10 @@ class ImageWindow(tk.Toplevel):
 
     @property
     def window_title(self) -> str:
+        resize_option = self.zoom_options[self.current_resize]
         return f'{self.window_id} ' \
                f'{os.path.split(self.source_path)[-1] if self.source_path else self.default_file_name} ' \
-               f'{int(self.zoom_options[self.current_resize] * 100)}%'
+               f'{resize_option if isinstance(resize_option, str) else int(resize_option * 100)}%'
 
     @window_title.setter
     def window_title(self, source_path: str | None = None):
@@ -74,9 +75,7 @@ class ImageWindow(tk.Toplevel):
     def update_image(self, image: Image):
         self.image = image
         resize_scale = self.zoom_options[self.current_resize]
-        self.displayed_image = self.image.resize(
-            (round(self.image.width * resize_scale), round(self.image.height * resize_scale)), Image.ANTIALIAS)
-        self.refresh_display_image()
+        self.resize_image(resize_scale)
 
     def refresh_display_image(self):
         self._img = ImageTk.PhotoImage(self.displayed_image)
@@ -94,6 +93,12 @@ class ImageWindow(tk.Toplevel):
             self.current_resize = len(self.zoom_options) - 1
 
         resize_scale = self.zoom_options[self.current_resize]
+        self.resize_image(resize_scale)
+
+    def resize_image(self, resize_scale: float | str):
+        if resize_scale == ZoomEnum.ZOOM_FULL:
+            resize_scale = self.winfo_screenwidth() / self.image.width
+
         self.displayed_image = self.image.resize(
             (round(self.image.width * resize_scale), round(self.image.height * resize_scale)), Image.ANTIALIAS)
         self.refresh_display_image()

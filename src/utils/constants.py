@@ -28,3 +28,4 @@ class ZoomEnum:
     ZOOM_100: float = 1
     ZOOM_150: float = 1.5
     ZOOM_200: float = 2
+    ZOOM_FULL: str = 'FULL'
