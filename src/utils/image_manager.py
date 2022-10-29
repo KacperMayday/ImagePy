@@ -3,6 +3,7 @@ import logging
 import os
 import time
 import tkinter as tk
+from tkinter import ttk
 
 from PIL import Image, ImageTk
 
@@ -24,15 +25,24 @@ class ImageWindow(tk.Toplevel):
         self.window_id: str = self.calculate_window_id()
         self.default_file_name: str = 'Duplicated'
         self._img = None  # this is needed only to keep canvas image away from garbage collector
-        self.img_canvas = tk.Canvas(master=self)
+        self.frame = ttk.Frame(self)
+        self.img_canvas = tk.Canvas(self.frame, scrollregion=(0, 0, self.image.width, self.image.height))
+        self.hbar = tk.Scrollbar(self.frame, orient=tk.HORIZONTAL)
+        self.hbar.pack(side=tk.BOTTOM, fill=tk.X)
+        self.hbar.config(command=self.img_canvas.xview)
+        self.vbar = tk.Scrollbar(self.frame, orient=tk.VERTICAL)
+        self.vbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.vbar.config(command=self.img_canvas.yview)
         self.img_canvas.pack()
         self.update_image(self.image)
 
+        self.frame.pack()
         self.window_title = self.source_path
         self.focus_set()
         self.bind("<FocusIn>", lambda _: ImageManager.set_focus(self))
         self.bind('<Destroy>', lambda _: ImageManager.set_focus(None))
         self.bind('<Control-MouseWheel>', self.resize)
+        self.bind('<MouseWheel>', lambda e: self.img_canvas.yview_scroll(-1*(e.delta//120), "units"))
 
     @staticmethod
     def is_gray(img: Image) -> str:
@@ -63,14 +73,18 @@ class ImageWindow(tk.Toplevel):
 
     def update_image(self, image: Image):
         self.image = image
-        self.displayed_image = copy.deepcopy(self.image)
+        resize_scale = self.zoom_options[self.current_resize]
+        self.displayed_image = self.image.resize(
+            (round(self.image.width * resize_scale), round(self.image.height * resize_scale)), Image.ANTIALIAS)
         self.refresh_display_image()
 
     def refresh_display_image(self):
         self._img = ImageTk.PhotoImage(self.displayed_image)
         self.img_canvas.config(height=self._img.height(), width=self._img.width())
         self.img_canvas.create_image(0, 0, image=self._img, anchor=tk.NW)
+        self.img_canvas.config(xscrollcommand=self.hbar.set, yscrollcommand=self.vbar.set)
         self.window_title = self.source_path
+        self.img_canvas.config(scrollregion=(0, 0, self.displayed_image.width, self.displayed_image.height))
 
     def resize(self, resize_event: tk.Event):
         self.current_resize -= resize_event.delta // 120
