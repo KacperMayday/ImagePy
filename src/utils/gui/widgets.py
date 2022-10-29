@@ -9,19 +9,24 @@ logger = logging.getLogger(__name__)
 
 
 class SliderWidget(tk.Frame):
-    def __init__(self, root: tk.Tk | tk.BaseWidget, min_intensity_level: int = MIN_INTENSITY_LEVEL,
-                 max_intensity_level: int = MAX_INTENSITY_LEVEL, **options):
-        super().__init__(root, options)
+    def __init__(self, root: tk.Tk | tk.BaseWidget, initial_value: int | None = None,
+                 min_intensity_level: int = MIN_INTENSITY_LEVEL,
+                 max_intensity_level: int = MAX_INTENSITY_LEVEL, slider_length: int = 200, **options):
+        super().__init__(root, **options)
         self.slider_variable = tk.IntVar()
         tk.Scale(self, from_=min_intensity_level, to=max_intensity_level, orient=tk.HORIZONTAL,
                  variable=self.slider_variable,
-                 tickinterval=max_intensity_level, showvalue=False, sliderlength=10).grid(row=0, column=0)
+                 tickinterval=max_intensity_level,
+                 showvalue=False, sliderlength=10, length=slider_length).grid(row=0, column=0)
 
         tk.Entry(self,
                  textvariable=self.slider_variable,
                  width=int(math.log10(max_intensity_level)) + 2).grid(row=0,
                                                                       column=2,
                                                                       sticky='NW')
+
+        if initial_value:
+            self.set(initial_value)
 
     def get(self) -> int:
         return self.slider_variable.get()
