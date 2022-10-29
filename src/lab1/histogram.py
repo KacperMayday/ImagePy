@@ -102,11 +102,11 @@ class HistogramWidget(tk.Toplevel):
     def __init__(self, source_image: Image, title: str):
         super(HistogramWidget, self).__init__()
         self.title(title)
-        self.geometry('300x400')
+        self.geometry('400x400')
         self.pack_propagate(False)
         self.image = source_image
         self.histogram_max_height = 200
-
+        tk.Label(self, text='Hover cursor over histogram to see value and count for specific pixel').pack()
         self.histogram_values = self.calculate_histogram_values(self.image)
         self.plot_histogram(self.histogram_values)
 
