@@ -42,7 +42,7 @@ def create_menu(root: tk.Toplevel | tk.Tk) -> tk.Menu:
     menubar.add_cascade(label="Image", menu=edit_menu)
 
     process_menu = tk.Menu(menubar, tearoff=0)
-    process_menu.add_command(label="Math", command=lambda: gui_mock(ImageManager.get_focus_window()),
+    process_menu.add_command(label="Histogram manipulation", command=lambda: gui_mock(ImageManager.get_focus_window()),
                              font=custom_font)
     process_menu.add_command(label="Image Calculator", command=not_implemented, font=custom_font)
     menubar.add_cascade(label="Process", menu=process_menu)

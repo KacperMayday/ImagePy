@@ -1,7 +1,6 @@
 import logging
 import math
 import tkinter as tk
-from typing import Callable
 
 from utils.constants import MAX_INTENSITY_LEVEL, MIN_INTENSITY_LEVEL
 from utils.utils import ColourIterator
