@@ -21,7 +21,7 @@ def invert_image(image_window: ImageWindow) -> None:
         case ImageModeEnum.COLOUR:
             list_of_pixels = [tuple([MAX_INTENSITY_LEVEL - j for j in i]) for i in list_of_pixels]
         case _:
-            logger.error(ValueError('Niepoprawny format obrazu!'))
+            logger.error(ValueError('Invalid image format!'))
 
     inverted_image = Image.new(source_image.mode, source_image.size)
     inverted_image.putdata(list_of_pixels)

@@ -60,15 +60,6 @@ class LinearAdjustmentWidget(tk.Toplevel):
         self.lower_boundary_variable.trace('w', self.update_threshold)
         self.higher_boundary_variable.trace('w', self.update_threshold)
 
-        # self.percent_frame = tk.Frame(self.frame)
-        # tk.Label(self.percent_frame, text="Procent przesycenia %: ").pack()
-        # slider_percent = SliderWidget(self.percent_frame, initial_value=MIN_INTENSITY_LEVEL, slider_length=100,
-        #                               max_intensity_level=100)
-        # self.percent = slider_percent.slider_variable
-        #
-        # slider_percent.pack()
-        # self.percent_frame.pack()
-
         self.reset_button = tk.Button(self.frame, text='Reset', command=self.reset_image)
         self.reset_button.pack()
         self.close_button = tk.Button(self.frame, text='Apply', command=self.linear_adjustment)
@@ -99,7 +90,6 @@ class LinearAdjustmentWidget(tk.Toplevel):
 
     def reset_image(self):
         self.image_window.update_image(self.image)
-        # self.percent.set(0)
         for child in self.histogram_canvas.lines:
             self.histogram_canvas.delete(child)
 
@@ -113,28 +103,22 @@ class LinearAdjustmentWidget(tk.Toplevel):
     def calculate_linear_adjustment(pixel_value: int, min_in: int, max_in: int, min_out: int, max_out: int) -> int:
         if max_in == min_in:
             return pixel_value
-        # return (pixel_value - min_in) * MAX_INTENSITY_LEVEL // (max_in - min_in)
-        return round((pixel_value - min_in) * (((max_out - min_out) / (max_in - min_in)) + min_out))
+        return round((pixel_value - min_in) * ((max_out - min_out) / (max_in - min_in)) + min_out)
 
     def linear_adjustment(self, _a=None, _b=None, _c=None):
         image = self.image
         list_of_pixels = list(image.getdata())
-        # stretch_threshold_coefficient = max(int(self.percent.get()) / 100, 0) if isinstance(self.percent.get(),
-        #                                                                                     int) else 0
-        # threshold = round(stretch_threshold_coefficient * len(list_of_pixels))
+
         min_in = min(list_of_pixels)
         max_in = max(list_of_pixels)
         min_out = self.lower_boundary_variable.get()
         max_out = self.higher_boundary_variable.get()
         match image.mode:
             case ImageModeEnum.GREYSCALE:
-                # sorted_list = sorted(list_of_pixels)
-                # max_value = max(sorted_list[:-threshold if threshold != 0 else -1])
-                # min_value = min(sorted_list[threshold:])
                 list_of_pixels = [self.calculate_linear_adjustment(i, min_in, max_in, min_out, max_out)
                                   for i in list_of_pixels]
             case _:
-                logger.error(ValueError('Niepoprawny format obrazu!'))
+                logger.error(ValueError('Invalid image format!'))
 
         inverted_image = Image.new(image.mode, image.size)
         inverted_image.putdata(list_of_pixels)
@@ -199,9 +183,9 @@ class GammaCorrectionWidget(tk.Toplevel):
         gradient_bar.pack()
 
         self.percent_frame = tk.Frame(self.frame)
-        tk.Label(self.percent_frame, text="Procent przesycenia %: ").pack()
+        tk.Label(self.percent_frame, text="Gamma coefficient: ").pack()
         slider_percent = SliderWidget(self.percent_frame, initial_value=1, slider_length=100,
-                                      max_intensity_level=1.5, resolution=0.05, min_intensity_level=0.5,
+                                      max_intensity_level=3, resolution=0.05, min_intensity_level=0.5,
                                       tick_interval=1)
         slider_percent.entry = tk.Entry(slider_percent,
                                         textvariable=slider_percent.slider_variable,
@@ -245,7 +229,7 @@ class GammaCorrectionWidget(tk.Toplevel):
             case ImageModeEnum.GREYSCALE:
                 list_of_pixels = [self.calculate_gamma_adjustment(i, gamma_coefficient) for i in list_of_pixels]
             case _:
-                logger.error(ValueError('Niepoprawny format obrazu!'))
+                logger.error(ValueError('Invalid image format!'))
 
         inverted_image = Image.new(image.mode, image.size)
         inverted_image.putdata(list_of_pixels)

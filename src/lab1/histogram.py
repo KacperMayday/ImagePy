@@ -131,7 +131,7 @@ class HistogramWidget(tk.Toplevel):
                 for i, colour in enumerate([ColourEnum.RED, ColourEnum.GREEN, ColourEnum.BLUE]):
                     histogram_values[colour] = HistogramWidget.count_values(image, i)
             case _:
-                logger.error(ValueError('Niepoprawny format obrazu!'))
+                logger.error(ValueError('Invalid image format!'))
 
         return histogram_values
 

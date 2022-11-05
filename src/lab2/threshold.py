@@ -69,6 +69,7 @@ class ThresholdWidget(tk.Toplevel):
         self.image_window.update_image(self.image)
         self.lower_boundary_variable.set(MIN_INTENSITY_LEVEL)
         self.higher_boundary_variable.set(MAX_INTENSITY_LEVEL)
+        self.is_binary.set(False)
 
     def threshold_image(self):
         filtered_image = self.image.point(
