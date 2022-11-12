@@ -98,7 +98,6 @@ class ImageMathWidget(tk.Toplevel):
                     input_value = self.input_number.get()
                 except tk.TclError:
                     input_value = 0
-                    self.input_number.set(0)
                 list_of_pixels = self.calculate_math(list_of_pixels, self.selected_math_operation.get(), input_value)
                 list_of_pixels = self.normalize(list_of_pixels) if self.normalize_flag.get() else list_of_pixels
             case _:
