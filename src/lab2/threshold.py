@@ -50,7 +50,7 @@ class ThresholdWidget(tk.Toplevel):
         self.higher_boundary_variable = slider_higher_boundary.slider_variable
         slider_higher_boundary.pack()
 
-        self.is_binary = tk.IntVar()
+        self.is_binary = tk.BooleanVar()
         binary_threshold = tk.Checkbutton(self.frame, text='Use binary threshold?', variable=self.is_binary)
         binary_threshold.pack()
         self.threshold_button = tk.Button(self.frame, text='Reset', command=self.reset_image)

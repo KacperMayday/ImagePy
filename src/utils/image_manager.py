@@ -39,8 +39,9 @@ class ImageWindow(tk.Toplevel):
         self.frame.pack()
         self.window_title = self.source_path
         self.focus_set()
+        ImageManager.add_window(self)
         self.bind("<FocusIn>", lambda _: ImageManager.set_focus(self))
-        self.bind('<Destroy>', lambda _: ImageManager.set_focus(None))
+        self.bind('<Destroy>', lambda _: ImageManager.delete_window(self))
         self.bind('<Control-MouseWheel>', self.resize)
         self.bind('<MouseWheel>', lambda e: self.img_canvas.yview_scroll(-1 * (e.delta // 120), "units"))
 
@@ -65,6 +66,7 @@ class ImageWindow(tk.Toplevel):
         resize_option = self.zoom_options[self.current_resize]
         return f'{self.window_id} ' \
                f'{os.path.split(self.source_path)[-1] if self.source_path else self.default_file_name} ' \
+               f'{self.image.mode} ' \
                f'{resize_option if isinstance(resize_option, str) else int(resize_option * 100)}%'
 
     @window_title.setter
@@ -105,6 +107,7 @@ class ImageWindow(tk.Toplevel):
 
 
 class ImageManager:
+    image_windows: list[ImageWindow] = []
     focused_window = None
 
     @staticmethod
@@ -112,6 +115,15 @@ class ImageManager:
         if ImageManager.focused_window is not window:
             ImageManager.focused_window = window
             ImageManager.get_focus_window()
+
+    @staticmethod
+    def add_window(window: ImageWindow) -> None:
+        if window.window_id not in [w.window_id for w in ImageManager.image_windows]:
+            ImageManager.image_windows.append(window)
+
+    @staticmethod
+    def delete_window(deleted_window: ImageWindow):
+        ImageManager.image_windows = [w for w in ImageManager.image_windows if w.window_id != deleted_window.window_id]
 
     @staticmethod
     def get_focus_window() -> ImageWindow | None:

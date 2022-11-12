@@ -9,6 +9,7 @@ FILE_TYPES = (('Obraz', '*.bmp *tif *png *jpg'),)
 class ImageModeEnum:
     COLOUR: str = 'RGB'
     GREYSCALE: str = 'L'
+    BINARY: str = '1'
 
 
 @dataclass(frozen=True)

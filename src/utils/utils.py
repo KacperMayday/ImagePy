@@ -55,8 +55,10 @@ def save_file_as(source_window: ImageWindow, extract_path: bool = False) -> None
         source_window.window_title = save_path
 
 
-def duplicate_image(source_window: ImageWindow | None) -> None:
-    if source_window:
+def duplicate_image(source_window: ImageWindow | None, source_image=None) -> None:
+    if source_image:
+        ImageWindow(source_image)
+    elif source_window:
         ImageWindow(source_window.image)
     else:
         logger.debug('Image to duplicate is not selected')

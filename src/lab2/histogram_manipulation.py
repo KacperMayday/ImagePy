@@ -23,7 +23,7 @@ class LinearAdjustmentWidget(tk.Toplevel):
     def __init__(self, source_image_window: ImageWindow):
         super(LinearAdjustmentWidget, self).__init__()
         self.title(source_image_window.window_title)
-        self.geometry('350x500')
+        self.geometry('350x400')
         self.pack_propagate(False)
         self.image_window = source_image_window
         self.image = source_image_window.image
@@ -140,18 +140,23 @@ def histogram_equalization(image_window: ImageWindow):
 
     image = image_window.image
     list_of_pixels = list(image.getdata())
-    histogram = HistogramWidget.count_values(image)
-    max_intensity_level = MAX_INTENSITY_LEVEL + 1
-    histogram_list = [0] * max_intensity_level
-    for i in histogram:
-        histogram_list[i] = histogram[i]
+    match image.mode:
+        case ImageModeEnum.GREYSCALE:
+            histogram = HistogramWidget.count_values(image)
+            max_intensity_level = MAX_INTENSITY_LEVEL + 1
+            histogram_list = [0] * max_intensity_level
+            for i in histogram:
+                histogram_list[i] = histogram[i]
 
-    histogram_cumulative_distributor = [sum(histogram_list[:i + 1]) for i in range(len(histogram_list))]
-    dim = len(list_of_pixels)
-    hcd_min = min(i for i in histogram_cumulative_distributor if i > 0)
-    list_of_pixels = [(histogram_cumulative_distributor[p] - hcd_min) * (max_intensity_level - 1) // (dim - hcd_min)
-                      for p in list_of_pixels]
-
+            histogram_cumulative_distributor = [sum(histogram_list[:i + 1]) for i in range(len(histogram_list))]
+            dim = len(list_of_pixels)
+            hcd_min = min(i for i in histogram_cumulative_distributor if i > 0)
+            list_of_pixels = [
+                (histogram_cumulative_distributor[p] - hcd_min) * (max_intensity_level - 1) // (dim - hcd_min)
+                for p in list_of_pixels]
+        case _:
+            logger.error(ValueError('Invalid image format!'))
+    
     inverted_image = Image.new(image.mode, image.size)
     inverted_image.putdata(list_of_pixels)
     image_window.update_image(inverted_image)

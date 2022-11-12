@@ -125,7 +125,7 @@ class HistogramWidget(tk.Toplevel):
     def calculate_histogram_values(image: Image) -> dict[str, dict[int, int]]:
         histogram_values = dict()
         match image.mode:
-            case ImageModeEnum.GREYSCALE:
+            case ImageModeEnum.GREYSCALE | ImageModeEnum.BINARY:
                 histogram_values[ColourEnum.GREYSCALE] = HistogramWidget.count_values(image)
             case ImageModeEnum.COLOUR:
                 for i, colour in enumerate([ColourEnum.RED, ColourEnum.GREEN, ColourEnum.BLUE]):
