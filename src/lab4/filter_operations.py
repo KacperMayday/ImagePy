@@ -54,7 +54,7 @@ class BlurWidget(tk.Toplevel):
         kernel_sum = kernel.sum()
         kernel = kernel / kernel_sum if kernel_sum else kernel
 
-        modified_image_array = self.border_widget.apply_border_fill(image_array, kernel, cv2.filter2D)
+        modified_image_array = self.border_widget.apply_border_fill_2d(image_array, kernel, cv2.filter2D)
         modified_image = Image.fromarray(modified_image_array.astype('uint8'), 'L')
 
         self.image_window.update_image(modified_image)

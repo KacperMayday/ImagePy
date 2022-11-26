@@ -74,6 +74,7 @@ class BorderFillWidget(tk.Frame):
 
         tk.Label(self, text='User constant:').pack()
         self.user_constant_entry = tk.Entry(self, width=5)
+        self.user_constant_entry.insert(tk.END, '0')
         self.user_constant_entry.pack()
 
     def disable_entry(self, *_):
@@ -112,7 +113,11 @@ class BorderFillWidget(tk.Frame):
                 modified_image_array = modified_image_array[pad_size:-pad_size, pad_size:-pad_size]
             else:
                 modified_image_array = filter_operation(image_array, -1, kernel)
-                modified_image_array = np.pad(modified_image_array, pad_size, constant_values=border_constant)
+                # modified_image_array = np.pad(modified_image_array, pad_size, constant_values=border_constant)
+                modified_image_array[:pad_size, :] = border_constant
+                modified_image_array[-pad_size:, :] = border_constant
+                modified_image_array[:, :pad_size] = border_constant
+                modified_image_array[:, -pad_size:] = border_constant
 
         return modified_image_array
 
@@ -134,6 +139,10 @@ class BorderFillWidget(tk.Frame):
                 modified_image_array = modified_image_array[pad_size:-pad_size, pad_size:-pad_size]
             else:
                 modified_image_array = filter_operation(image_array, kernel_size)
-                modified_image_array = np.pad(modified_image_array, pad_size, constant_values=border_constant)
+                modified_image_array[:pad_size, :] = border_constant
+                modified_image_array[-pad_size:, :] = border_constant
+                modified_image_array[:, :pad_size] = border_constant
+                modified_image_array[:, -pad_size:] = border_constant
+                # modified_image_array = np.pad(modified_image_array, pad_size, constant_values=border_constant)
 
         return modified_image_array
