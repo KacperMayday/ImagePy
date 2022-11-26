@@ -109,7 +109,7 @@ class LinearAdjustmentWidget(tk.Toplevel):
             if max_in == min_in:
                 return pixel_value
 
-            return round((pixel_value - min_out) * (MAX_INTENSITY_LEVEL / (max_out - min_out)))
+            return round((pixel_value - min_in) * (MAX_INTENSITY_LEVEL / (max_in - min_in)))
 
     def linear_adjustment(self, _a=None, _b=None, _c=None):
         image = self.image
