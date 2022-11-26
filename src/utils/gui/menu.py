@@ -4,6 +4,9 @@ import tkinter as tk
 from lab3.image_calculator import ImageMathOperators, image_calculator
 from lab3.image_math import image_math
 from lab3.utils import convert_to_binary
+from lab4.edge_detection import edge_detection
+from lab4.filter_operations import filter_calculation
+from lab4.median_blur_filter import median_blur
 from src.debug.debug import create_debug_menu
 from src.lab1.histogram import show_histogram
 from src.lab2.histogram_manipulation import gamma_correction, histogram_equalization, linear_adjustment
@@ -91,6 +94,19 @@ def create_menu(root: tk.Toplevel | tk.Tk) -> tk.Menu:
     process_menu.add_command(label="Math", command=lambda: image_math(ImageManager.get_focus_window()),
                              font=custom_font)
     menubar.add_cascade(label="Process", menu=process_menu)
+
+    filter_menu = tk.Menu(menubar, tearoff=0)
+    filter_menu.add_command(label="Blur image",
+                            command=lambda: filter_calculation(ImageManager.get_focus_window(), blur_flag=True),
+                            font=custom_font)
+    filter_menu.add_command(label="Sharpen image",
+                            command=lambda: filter_calculation(ImageManager.get_focus_window(), blur_flag=False),
+                            font=custom_font)
+    filter_menu.add_command(label="Edge detection", command=lambda: edge_detection(ImageManager.get_focus_window()),
+                            font=custom_font)
+    filter_menu.add_command(label="Median blur", command=lambda: median_blur(ImageManager.get_focus_window()),
+                            font=custom_font)
+    menubar.add_cascade(label="Filters", menu=filter_menu)
 
     help_menu = tk.Menu(menubar, tearoff=0)
     help_menu.add_command(label="Histogram", command=lambda: show_histogram(ImageManager.get_focus_window()),

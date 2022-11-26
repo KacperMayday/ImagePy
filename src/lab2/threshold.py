@@ -1,5 +1,9 @@
 import tkinter as tk
 
+import cv2
+import numpy as np
+from PIL import Image
+
 from src.lab1.histogram import HistogramCanvas, HistogramWidget
 from src.utils.constants import ColourEnum, ImageModeEnum, MAX_INTENSITY_LEVEL, MIN_INTENSITY_LEVEL
 from src.utils.gui.widgets import GradientBar, SliderWidget
@@ -18,7 +22,7 @@ class ThresholdWidget(tk.Toplevel):
     def __init__(self, source_image_window: ImageWindow):
         super(ThresholdWidget, self).__init__()
         self.title(source_image_window.window_title)
-        self.geometry('350x400')
+        self.geometry('350x500')
         self.pack_propagate(False)
         self.image_window = source_image_window
         self.image = source_image_window.image
@@ -53,10 +57,10 @@ class ThresholdWidget(tk.Toplevel):
         self.is_binary = tk.BooleanVar()
         binary_threshold = tk.Checkbutton(self.frame, text='Use binary threshold?', variable=self.is_binary)
         binary_threshold.pack()
-        self.threshold_button = tk.Button(self.frame, text='Reset', command=self.reset_image)
-        self.threshold_button.pack()
-        self.close_button = tk.Button(self.frame, text='Apply', command=self.destroy)
-        self.close_button.pack()
+        tk.Button(self.frame, text='Use Otsu threshold', command=self.otsu_threshold).pack()
+        tk.Button(self.frame, text='Use adaptive threshold', command=self.adaptive_threshold).pack()
+        tk.Button(self.frame, text='Reset', command=self.reset_image).pack()
+        tk.Button(self.frame, text='Apply', command=self.destroy).pack()
         self.frame.pack()
 
         self.filters = [[self.lower_boundary_variable, 'lower'],
@@ -64,6 +68,19 @@ class ThresholdWidget(tk.Toplevel):
         self.lower_boundary_variable.trace('w', self.update_threshold)
         self.higher_boundary_variable.trace('w', self.update_threshold)
         self.is_binary.trace('w', self.update_threshold)
+
+    def otsu_threshold(self):
+        img = np.array(self.image)
+        ret, thresh1 = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        self.lower_boundary_variable.set(int(ret))
+        self.higher_boundary_variable.set(255)
+        self.is_binary.set(True)
+
+    def adaptive_threshold(self):
+        img = np.array(self.image)
+        thresh1 = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+        threshold_image = Image.fromarray(thresh1.astype('uint8'), 'L')
+        self.image_window.update_image(threshold_image)
 
     def reset_image(self):
         self.image_window.update_image(self.image)
