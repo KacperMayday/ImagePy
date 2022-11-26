@@ -42,7 +42,6 @@ class HistogramCanvas(tk.Canvas):
         self.height = height
         self.width = width
         self.histogram_dict = histogram_dict
-        self.max_pixel_count = max(self.histogram_dict.values())
         self.pixel_count = tk.StringVar(value=f'Count: ---')
         self.pixel_value = tk.StringVar(value=f'Value: ---')
         self.border_offset = highlight_thickness
@@ -63,12 +62,14 @@ class HistogramCanvas(tk.Canvas):
             self.pixel_value.set(f'Value: {mouse_x}')
 
     def plot_histogram(self):
+        max_pixel_count = max(self.histogram_dict.values())
+
         for intensity_level in range(self.width + 1):
             self.lines.append(self.create_line(intensity_level + self.border_offset,
                                                self.height,
                                                intensity_level + self.border_offset,
                                                self.height - ((self.histogram_dict[
-                                                                   intensity_level] / self.max_pixel_count) * self.height
+                                                                   intensity_level] / max_pixel_count) * self.height
                                                               if intensity_level in self.histogram_dict else MIN_INTENSITY_LEVEL),
                                                fill=self.colour))
 

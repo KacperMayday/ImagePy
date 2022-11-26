@@ -57,7 +57,7 @@ def create_menu(root: tk.Toplevel | tk.Tk) -> tk.Menu:
     process_menu.add_command(label="Histogram equalization",
                              command=lambda: histogram_equalization(ImageManager.get_focus_window()),
                              font=custom_font)
-    process_menu.add_command(label="Linear adjustment",
+    process_menu.add_command(label="Linear stretching",
                              command=lambda: linear_adjustment(ImageManager.get_focus_window()),
                              font=custom_font)
     process_menu.add_command(label="Gamma correction",
@@ -105,6 +105,10 @@ def create_menu(root: tk.Toplevel | tk.Tk) -> tk.Menu:
     filter_menu.add_command(label="Edge detection", command=lambda: edge_detection(ImageManager.get_focus_window()),
                             font=custom_font)
     filter_menu.add_command(label="Median blur", command=lambda: median_blur(ImageManager.get_focus_window()),
+                            font=custom_font)
+    filter_menu.add_separator()
+    filter_menu.add_command(label="Advanced edge detection",
+                            command=lambda: edge_detection(ImageManager.get_focus_window(), advanced_filter=True),
                             font=custom_font)
     menubar.add_cascade(label="Filters", menu=filter_menu)
 
