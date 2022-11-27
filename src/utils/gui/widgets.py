@@ -95,54 +95,24 @@ class BorderFillWidget(tk.Frame):
             user_constant = int(self.user_constant_entry.get())
             return border_fill_entry.border_type, user_constant
 
-    def apply_border_fill_2d(self, image_array: np.array, kernel: np.array, filter_operation) -> np.array:
+    def apply_border_fill(self, image_array: np.array, pad_size: int, filter_operation, **filter_args) \
+            -> np.array:
         border_fill_type_tuple = self.get()
-        pad_size = (kernel.shape[0] - 1) // 2
 
         if len(border_fill_type_tuple) == 1:
             border_type = border_fill_type_tuple[0]
             padded_image_array = cv2.copyMakeBorder(image_array, pad_size, pad_size, pad_size, pad_size, border_type)
-            modified_image_array = filter_operation(padded_image_array, -1, kernel)
+            modified_image_array = filter_operation(padded_image_array, **filter_args)
             modified_image_array = modified_image_array[pad_size:-pad_size, pad_size:-pad_size]
         else:
             border_type, border_constant = border_fill_type_tuple
             if border_type is not None:
                 image_array = cv2.copyMakeBorder(image_array, pad_size, pad_size, pad_size, pad_size,
                                                  border_type, value=border_constant)
-                modified_image_array = filter_operation(image_array, -1, kernel)
+                modified_image_array = filter_operation(image_array, **filter_args)
                 modified_image_array = modified_image_array[pad_size:-pad_size, pad_size:-pad_size]
             else:
-                modified_image_array = filter_operation(image_array, -1, kernel)
-                # modified_image_array = np.pad(modified_image_array, pad_size, constant_values=border_constant)
-                modified_image_array[:pad_size, :] = border_constant
-                modified_image_array[-pad_size:, :] = border_constant
-                modified_image_array[:, :pad_size] = border_constant
-                modified_image_array[:, -pad_size:] = border_constant
-
-        return modified_image_array
-
-    def apply_border_fill(self, image_array: np.array, kernel_size: int, filter_operation) -> np.array:
-        border_fill_type_tuple = self.get()
-        pad_size = (kernel_size - 1) // 2
-
-        if len(border_fill_type_tuple) == 1:
-            border_type = border_fill_type_tuple[0]
-            padded_image_array = cv2.copyMakeBorder(image_array, pad_size, pad_size, pad_size, pad_size, border_type)
-            modified_image_array = filter_operation(padded_image_array, kernel_size)
-            modified_image_array = modified_image_array[pad_size:-pad_size, pad_size:-pad_size]
-        else:
-            border_type, border_constant = border_fill_type_tuple
-            if border_type is not None:
-                image_array = cv2.copyMakeBorder(image_array, pad_size, pad_size, pad_size, pad_size,
-                                                 border_type, value=border_constant)
-                modified_image_array = filter_operation(image_array, kernel_size)
-                modified_image_array = modified_image_array[pad_size:-pad_size, pad_size:-pad_size]
-            else:
-                modified_image_array = filter_operation(image_array, kernel_size)
-                modified_image_array[:pad_size, :] = border_constant
-                modified_image_array[-pad_size:, :] = border_constant
-                modified_image_array[:, :pad_size] = border_constant
-                modified_image_array[:, -pad_size:] = border_constant
-                # modified_image_array = np.pad(modified_image_array, pad_size, constant_values=border_constant)
+                modified_image_array = filter_operation(image_array, **filter_args)
+                modified_image_array = np.pad(modified_image_array, pad_size, constant_values=border_constant)
 
         return modified_image_array

@@ -48,7 +48,9 @@ class MedianBlurWidget(tk.Toplevel):
         filter_size = median_blur_filters.get(self.chosen_filter.get(), list(median_blur_filters.values())[0])
         image_array = numpy.array(self.image)
 
-        blurred_image_array = self.border_widget.apply_border_fill(image_array, filter_size, cv2.medianBlur)
+        pad_size = (filter_size - 1) // 2
+        blurred_image_array = self.border_widget.apply_border_fill(image_array, pad_size, cv2.medianBlur,
+                                                                   ksize=filter_size)
         blurred_image = Image.fromarray(blurred_image_array.astype('uint8'), 'L')
 
         self.image_window.update_image(blurred_image)

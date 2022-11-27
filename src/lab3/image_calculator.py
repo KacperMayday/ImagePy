@@ -4,8 +4,7 @@ from dataclasses import dataclass
 
 from PIL import Image
 
-from lab2.histogram_manipulation import LinearAdjustmentWidget
-from utils.constants import ImageModeEnum, MAX_INTENSITY_LEVEL, MIN_INTENSITY_LEVEL
+from utils.constants import ImageModeEnum
 from utils.image_manager import ImageWindow
 from utils.utils import duplicate_image
 
@@ -285,22 +284,6 @@ class ImageAdditionWidget(tk.Toplevel):
 
         self.frame.pack()
 
-    @staticmethod
-    def normalize(list_of_pixels: list[int]) -> list[int]:
-        min_in = min(list_of_pixels)
-        max_in = max(list_of_pixels)
-        if max_in > MAX_INTENSITY_LEVEL:
-            max_out = MAX_INTENSITY_LEVEL
-            min_out = max(max_out - max_in + min_in, MIN_INTENSITY_LEVEL)
-        elif min_in < MIN_INTENSITY_LEVEL:
-            min_out = MIN_INTENSITY_LEVEL
-            max_out = min(min_out - min_in + max_in, MAX_INTENSITY_LEVEL)
-        else:
-            return list_of_pixels
-
-        return [LinearAdjustmentWidget.calculate_linear_adjustment(pixel, min_in, max_in, min_out, max_out)
-                for pixel in list_of_pixels]
-
     def update_image(self, **_):
         selected_window_titles = [self.selected_images[i].get() for i in range(len(self.selected_images))]
         selected_windows = [image_window for image_window in self.image_windows
@@ -314,9 +297,10 @@ class ImageAdditionWidget(tk.Toplevel):
 
         list_of_pixels = [list(selected_images[0].getdata()), list(selected_images[1].getdata())]
 
-        list_of_pixels = [pixel1 + pixel2 for pixel1, pixel2 in zip(list_of_pixels[0], list_of_pixels[1])]
         if self.normalize_flag.get():
-            list_of_pixels = self.normalize(list_of_pixels)
+            list_of_pixels = [pixel1 // 2 + pixel2 // 2 for pixel1, pixel2 in zip(list_of_pixels[0], list_of_pixels[1])]
+        else:
+            list_of_pixels = [pixel1 + pixel2 for pixel1, pixel2 in zip(list_of_pixels[0], list_of_pixels[1])]
 
         inverted_image = Image.new(selected_images[0].mode, selected_images[0].size)
         inverted_image.putdata(list_of_pixels)

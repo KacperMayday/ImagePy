@@ -54,7 +54,9 @@ class BlurWidget(tk.Toplevel):
         kernel_sum = kernel.sum()
         kernel = kernel / kernel_sum if kernel_sum else kernel
 
-        modified_image_array = self.border_widget.apply_border_fill_2d(image_array, kernel, cv2.filter2D)
+        pad_size = (kernel.shape[0] - 1) // 2
+        modified_image_array = self.border_widget.apply_border_fill(image_array, pad_size, cv2.filter2D, ddepth=-1,
+                                                                    kernel=kernel)
         modified_image = Image.fromarray(modified_image_array.astype('uint8'), 'L')
 
         self.image_window.update_image(modified_image)
@@ -90,7 +92,9 @@ class SharpenWidget(tk.Toplevel):
         image_array = numpy.array(self.image)
         kernel = numpy.array(sharpen_filters[int(self.chosen_filter.get())])
 
-        modified_image_array = self.border_widget.apply_border_fill_2d(image_array, kernel, cv2.filter2D)
+        pad_size = (kernel.shape[0] - 1) // 2
+        modified_image_array = self.border_widget.apply_border_fill(image_array, pad_size, cv2.filter2D, ddepth=-1,
+                                                                    kernel=kernel)
         modified_image = Image.fromarray(modified_image_array.astype('uint8'), 'L')
 
         self.image_window.update_image(modified_image)
