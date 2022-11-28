@@ -30,3 +30,11 @@ class ZoomEnum:
     ZOOM_150: float = 1.5
     ZOOM_200: float = 2
     ZOOM_FULL: str = 'FULL'
+
+
+@dataclass(frozen=True)
+class BinaryOperationEnum:
+    OPEN: str = 'Open'
+    CLOSE: str = 'Close'
+    ERODE: str = 'Erode'
+    DILATE: str = 'Dilate'

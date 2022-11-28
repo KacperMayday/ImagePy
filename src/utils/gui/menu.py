@@ -7,6 +7,8 @@ from lab3.utils import convert_to_binary
 from lab4.edge_detection import edge_detection
 from lab4.filter_operations import filter_calculation
 from lab4.median_blur_filter import median_blur
+from lab6.binary_operations import binary_calculation
+from lab6.measures import calculate_measures
 from src.debug.debug import create_debug_menu
 from src.lab1.histogram import show_histogram
 from src.lab2.histogram_manipulation import gamma_correction, histogram_equalization, linear_adjustment
@@ -93,6 +95,13 @@ def create_menu(root: tk.Toplevel | tk.Tk) -> tk.Menu:
 
     process_menu.add_command(label="Math", command=lambda: image_math(ImageManager.get_focus_window()),
                              font=custom_font)
+
+    process_menu.add_separator()
+
+    process_menu.add_command(label="Binary operations",
+                             command=lambda: binary_calculation(ImageManager.get_focus_window()),
+                             font=custom_font)
+
     menubar.add_cascade(label="Process", menu=process_menu)
 
     filter_menu = tk.Menu(menubar, tearoff=0)
@@ -114,6 +123,8 @@ def create_menu(root: tk.Toplevel | tk.Tk) -> tk.Menu:
 
     help_menu = tk.Menu(menubar, tearoff=0)
     help_menu.add_command(label="Histogram", command=lambda: show_histogram(ImageManager.get_focus_window()),
+                          font=custom_font)
+    help_menu.add_command(label="Export measures", command=lambda: calculate_measures(ImageManager.get_focus_window()),
                           font=custom_font)
     menubar.add_cascade(label="Analyze", menu=help_menu)
 

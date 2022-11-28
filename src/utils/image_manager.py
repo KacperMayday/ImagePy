@@ -21,7 +21,6 @@ class ImageWindow(tk.Toplevel):
         self.zoom_options = [ZoomEnum.ZOOM_10, ZoomEnum.ZOOM_20, ZoomEnum.ZOOM_25, ZoomEnum.ZOOM_50, ZoomEnum.ZOOM_100,
                              ZoomEnum.ZOOM_150, ZoomEnum.ZOOM_200, ZoomEnum.ZOOM_FULL]
         self.current_resize = self.zoom_options.index(ZoomEnum.ZOOM_100)
-        self.mode: str = self.is_gray(self.image)
         self.window_id: str = self.calculate_window_id()
         self.default_file_name: str = 'Duplicated'
         self._img = None  # this is needed only to keep canvas image away from garbage collector
@@ -45,9 +44,9 @@ class ImageWindow(tk.Toplevel):
         self.bind('<Control-MouseWheel>', self.resize)
         self.bind('<MouseWheel>', lambda e: self.img_canvas.yview_scroll(-1 * (e.delta // 120), "units"))
 
-    @staticmethod
-    def is_gray(img: Image) -> str:
-        return img.mode
+    @property
+    def mode(self):
+        return self.image.mode
 
     @staticmethod
     def calculate_window_id() -> str:
