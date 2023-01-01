@@ -43,7 +43,9 @@ class BinaryOperationsWidget(tk.Toplevel):
 
     def update_image(self):
         image_array = np.array(self.image)
-        kernel = np.ones((3, 3), np.uint8)
+        kernel = np.array([[0, 1, 0],
+                           [1, 1, 1],
+                           [0, 1, 0]], dtype=np.uint8)
 
         match self.chosen_filter.get():
             case BinaryOperationEnum.ERODE:

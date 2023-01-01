@@ -119,6 +119,9 @@ def create_menu(root: tk.Toplevel | tk.Tk) -> tk.Menu:
     filter_menu.add_command(label="Advanced edge detection",
                             command=lambda: edge_detection(ImageManager.get_focus_window(), advanced_filter=True),
                             font=custom_font)
+    filter_menu.add_command(label="Canny operator",
+                            command=lambda: edge_detection(ImageManager.get_focus_window(), canny_detection=True),
+                            font=custom_font)
     menubar.add_cascade(label="Filters", menu=filter_menu)
 
     help_menu = tk.Menu(menubar, tearoff=0)

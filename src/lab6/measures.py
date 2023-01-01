@@ -1,5 +1,5 @@
 import logging
-import tkinter as tk
+import math
 from tkinter import filedialog as fd
 
 import cv2
@@ -19,57 +19,44 @@ def calculate_measures(image_window: ImageWindow):
 
 class Measures:
     def __init__(self, cnt: np.array):
-        x, y, w, h = cv2.boundingRect(cnt)
-        rect_area = w * h
         convex_hull = cv2.convexHull(cnt)
-        convex_hull_area = cv2.contourArea(convex_hull)
-
-        self.moments: dict[str, float] = cv2.moments(cnt)
-        self.area: float = cv2.contourArea(cnt)
+        convex_hull_area = cv2.contourArea(convex_hull, False)
+        self.area: float = cv2.contourArea(cnt, False)
         self.perimeter: float = cv2.arcLength(cnt, True)
-        self.aspect_ratio: float = w / h
-        self.extent: float = self.area / rect_area
-        self.solidity: float = self.area / convex_hull_area
-        self.equivalent_diameter: float = np.sqrt(4 * self.area / np.pi)
+        self.w1: float = 2 * pow(self.area / math.pi, 0.5)
+        self.w2: float = self.perimeter / math.pi
+        self.w3: float = (self.perimeter / (2 * pow(self.area * math.pi, 0.5))) - 1
+        self.w9: float = 2 * pow(math.pi * self.area, 0.5) / self.perimeter
+        self.w10: float = self.area / convex_hull_area
+        moments = cv2.moments(cnt)
+        self.m1: float = moments['nu20'] + moments['nu02']
+        self.m2: float = pow(moments['nu20'] - moments['nu02'], 2) + 4 * pow(moments['nu11'], 2)
+        self.m3: float = pow(moments['nu30'] - 3 * moments['nu12'], 2) + pow(3 * moments['nu21'] - moments['nu03'], 2)
+        self.moments = moments
 
         logger.debug('Created Measure object with following data:')
-        logger.debug(f'{self.moments=}')
         logger.debug(f'{self.area=}')
         logger.debug(f'{self.perimeter=}')
-        logger.debug(f'{self.aspect_ratio=}')
-        logger.debug(f'{self.extent=}')
-        logger.debug(f'{self.solidity=}')
-        logger.debug(f'{self.equivalent_diameter=}')
+        logger.debug(f'{self.w1=}')
+        logger.debug(f'{self.w2=}')
+        logger.debug(f'{self.w3=}')
+        logger.debug(f'{self.w9=}')
+        logger.debug(f'{self.w10=}')
+        logger.debug(f'{self.m1=}')
+        logger.debug(f'{self.m2=}')
+        logger.debug(f'{self.m3=}')
+        logger.debug(f'{self.moments=}')
 
 
-class MeasuresFrame(tk.Frame):
-    def __init__(self, root: tk.Frame):
-        super(MeasuresFrame, self).__init__(root)
-        tk.Label(self, text='Measures').pack()
-
-
-# class MeasuresWidget(tk.Toplevel):
 class MeasuresWidget:
     def __init__(self, source_window: ImageWindow):
         super(MeasuresWidget, self).__init__()
-        # self.title(source_window.window_title)
-        # self.image_window = source_window
         self.image = source_window.image
-        # self.geometry('300x250')
-        # self.pack_propagate(False)
-        # self.frame = tk.Frame(self)
-
-        # MeasuresFrame(self.frame).pack()
         self.measures = self.get_measures()
-
-        # tk.Button(self.frame, text='Export to csv', command=self.save_measures).pack()
-        # tk.Button(self.frame, text='Close', command=self.destroy).pack()
-        #
-        # self.frame.pack()
         self.save_measures()
 
     @staticmethod
-    def get_save_path() -> str:
+    def get_save_path() -> str | None:
         default_ask_save_params = {'filetypes': (('CSV file', '*.csv'),), 'defaultextension': 'csv'}
         save_path = fd.asksaveasfilename(**default_ask_save_params)
 
@@ -86,12 +73,18 @@ class MeasuresWidget:
 
             measure_vals = np.array(measure_vals)
             measure_cols = list(self.measures[0].__dict__.keys())
+            sep = ';'
 
             # noinspection PyTypeChecker
-            np.savetxt(save_path, measure_vals, fmt='%1.4f', delimiter=',', header=','.join(measure_cols), comments='')
+            np.savetxt(save_path, measure_vals, fmt=" %1.4f", delimiter=sep, header=sep.join(measure_cols), comments='')
+
+            with open(save_path, 'r+') as f:
+                content = f.read()
+                f.seek(0, 0)
+                f.write(f'"sep={sep}"\n' + content)
 
     def get_measures(self) -> list[Measures]:
         image_array = np.array(self.image)
-        contours, _hierarchy = cv2.findContours(image_array, 1, 2)
+        contours, _hierarchy = cv2.findContours(image_array, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
         measures = [Measures(cnt) for cnt in contours]
         return measures
