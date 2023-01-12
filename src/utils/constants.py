@@ -3,6 +3,7 @@ from dataclasses import dataclass
 MAX_INTENSITY_LEVEL = 255
 MIN_INTENSITY_LEVEL = 0
 FILE_TYPES = (('Obraz', '*.bmp *tif *png *jpg'),)
+DEBUG = False
 
 
 @dataclass(frozen=True)
@@ -38,3 +39,10 @@ class BinaryOperationEnum:
     CLOSE: str = 'Close'
     ERODE: str = 'Erode'
     DILATE: str = 'Dilate'
+
+
+@dataclass(frozen=True)
+class LogicFilterEnum:
+    HORIZONTAL: str = 'Horizontal lines and isolated points'
+    VERTICAL: str = 'Vertical lines and isolated points'
+    ISOLATED_POINTS: str = 'Only isolated points'

@@ -70,7 +70,8 @@ class HistogramCanvas(tk.Canvas):
                                                intensity_level + self.border_offset,
                                                self.height - ((self.histogram_dict[
                                                                    intensity_level] / max_pixel_count) * self.height
-                                                              if intensity_level in self.histogram_dict else MIN_INTENSITY_LEVEL),
+                                                              if intensity_level in self.histogram_dict
+                                                              else MIN_INTENSITY_LEVEL),
                                                fill=self.colour))
 
 

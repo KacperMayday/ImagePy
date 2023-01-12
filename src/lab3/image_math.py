@@ -87,7 +87,7 @@ class ImageMathWidget(tk.Toplevel):
         else:
             return list_of_pixels
 
-        return [LinearAdjustmentWidget.calculate_linear_adjustment(pixel, min_in, max_in, min_out, max_out)
+        return [LinearAdjustmentWidget.calculate_linear_adjustment(pixel, min_out, max_out)
                 for pixel in list_of_pixels]
 
     def update_image(self, *_):

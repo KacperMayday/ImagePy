@@ -35,11 +35,13 @@ class ThresholdWidget(tk.Toplevel):
         self.histogram_canvas.pack()
         gradient_bar = GradientBar(root=self.frame, height=10, colour_iterator=ColourIterator(colour))
         gradient_bar.pack()
-        self.lower_boundary_line = self.histogram_canvas.create_line(self.histogram_canvas.border_offset,
-                                                                     self.histogram_canvas.border_offset,
-                                                                     self.histogram_canvas.border_offset,
-                                                                     self.histogram_max_height + self.histogram_canvas.border_offset,
-                                                                     fill='red')
+        self.lower_boundary_line = self.histogram_canvas.create_line(
+            self.histogram_canvas.border_offset,
+            self.histogram_canvas.border_offset,
+            self.histogram_canvas.border_offset,
+            self.histogram_max_height + self.histogram_canvas.border_offset,
+            fill='red'
+        )
         slider_lower_boundary = SliderWidget(self.frame, initial_value=MIN_INTENSITY_LEVEL)
         self.lower_boundary_variable = slider_lower_boundary.slider_variable
         slider_lower_boundary.pack()

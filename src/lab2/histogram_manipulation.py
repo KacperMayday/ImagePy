@@ -37,11 +37,13 @@ class LinearAdjustmentWidget(tk.Toplevel):
         gradient_bar = GradientBar(root=self.frame, height=10, colour_iterator=ColourIterator(colour))
         gradient_bar.pack()
 
-        self.lower_boundary_line = self.histogram_canvas.create_line(self.histogram_canvas.border_offset,
-                                                                     self.histogram_canvas.border_offset,
-                                                                     self.histogram_canvas.border_offset,
-                                                                     self.histogram_max_height + self.histogram_canvas.border_offset,
-                                                                     fill='red')
+        self.lower_boundary_line = self.histogram_canvas.create_line(
+            self.histogram_canvas.border_offset,
+            self.histogram_canvas.border_offset,
+            self.histogram_canvas.border_offset,
+            self.histogram_max_height + self.histogram_canvas.border_offset,
+            fill='red'
+        )
         slider_lower_boundary = SliderWidget(self.frame, initial_value=MIN_INTENSITY_LEVEL)
         self.lower_boundary_variable = slider_lower_boundary.slider_variable
         slider_lower_boundary.pack()
@@ -100,7 +102,7 @@ class LinearAdjustmentWidget(tk.Toplevel):
         self.histogram_canvas.plot_histogram()
 
     @staticmethod
-    def calculate_linear_adjustment(pixel_value: int, min_in: int, max_in: int, min_out: int, max_out: int) -> int:
+    def calculate_linear_adjustment(pixel_value: int, min_out: int, max_out: int) -> int:
         if pixel_value < min_out:
             return MIN_INTENSITY_LEVEL
         elif pixel_value > max_out:
@@ -121,7 +123,7 @@ class LinearAdjustmentWidget(tk.Toplevel):
         max_out = min(self.higher_boundary_variable.get(), max_in)
         match image.mode:
             case ImageModeEnum.GREYSCALE:
-                list_of_pixels = [self.calculate_linear_adjustment(i, min_in, max_in, min_out, max_out)
+                list_of_pixels = [self.calculate_linear_adjustment(i, min_out, max_out)
                                   for i in list_of_pixels]
             case _:
                 logger.error(ValueError('Invalid image format!'))
@@ -162,7 +164,7 @@ def histogram_equalization(image_window: ImageWindow):
                 for p in list_of_pixels]
         case _:
             logger.error(ValueError('Invalid image format!'))
-    
+
     inverted_image = Image.new(image.mode, image.size)
     inverted_image.putdata(list_of_pixels)
     image_window.update_image(inverted_image)
