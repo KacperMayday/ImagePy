@@ -3,24 +3,74 @@ import logging
 import os
 import time
 import tkinter as tk
+from datetime import datetime
 from tkinter import ttk
 
+import numpy as np
 from PIL import Image, ImageTk
 
 from src.utils.constants import ZoomEnum
 
 logger = logging.getLogger(__name__)
 
+Point = tuple[int, int]
+
+
+def bresenham(start: Point, end: Point) -> list[Point]:
+    """
+    Calculate list of points for given starting and ending points
+
+    :param start: line starting point
+    :param end: line ending point
+    :return: list of points on given line
+    """
+    x, y = start
+    x1, y1 = end
+    points_in_line = []
+    dx = abs(x1 - x)
+    dy = abs(y1 - y)
+    sx = -1 if x > x1 else 1
+    sy = -1 if y > y1 else 1
+
+    if dx > dy:  # determine direction
+        err = dx / 2
+        while x != x1:
+            points_in_line.append((x, y))
+            err -= dy
+            if err < 0:
+                y += sy
+                err += dx
+            x += sx
+    else:
+        err = dy / 2
+        while y != y1:
+            points_in_line.append((x, y))
+            err -= dx
+            if err < 0:
+                x += sx
+                err += dy
+            y += sy
+    points_in_line.append((x, y))
+    return points_in_line
+
 
 class ImageWindow(tk.Toplevel):
+    """
+    Main class representing window with an image. It is selectable, zoomable and has drawing functionality.
+    """
     def __init__(self, image: Image, source_path: str | None = None):
         super().__init__()
+        # image OS absolute path
         self.source_path: str = source_path
         self.image: Image = image
+        # make a copy of original image to prevent changing it
         self.displayed_image = copy.deepcopy(image)
+        # define zoom order and possible options
         self.zoom_options = [ZoomEnum.ZOOM_10, ZoomEnum.ZOOM_20, ZoomEnum.ZOOM_25, ZoomEnum.ZOOM_50, ZoomEnum.ZOOM_100,
                              ZoomEnum.ZOOM_150, ZoomEnum.ZOOM_200, ZoomEnum.ZOOM_FULL]
+        # set default zoom
         self.current_resize = self.zoom_options.index(ZoomEnum.ZOOM_100)
+        # unique window id number
         self.window_id: str = self.calculate_window_id()
         self.default_file_name: str = 'Duplicated'
         self._img = None  # this is needed only to keep canvas image away from garbage collector
@@ -37,12 +87,97 @@ class ImageWindow(tk.Toplevel):
 
         self.frame.pack()
         self.window_title = self.source_path
+        # set focus for new window
         self.focus_set()
+        # register this window in ImageManager
         ImageManager.add_window(self)
+        # bind controls
         self.bind("<FocusIn>", lambda _: ImageManager.set_focus(self))
         self.bind('<Destroy>', lambda _: ImageManager.delete_window(self))
         self.bind('<Control-MouseWheel>', self.resize)
         self.bind('<MouseWheel>', lambda e: self.img_canvas.yview_scroll(-1 * (e.delta // 120), "units"))
+
+        # project
+        self.previous_coords = None
+        self.lines = []
+        self.drawn_coords = []
+        # define line parameters for tk.Canvas.create_line() method
+        self.line_parameters = {'fill': '#f5e505', 'width': 2}
+
+    def clear_drawing(self):
+        """
+        Resets drawing state.
+        """
+        self.img_canvas.configure(cursor='arrow')
+        self.clear_canvas()
+        self.img_canvas.unbind('<B1-Motion>')
+        self.img_canvas.unbind('<Button-1>')
+        self.img_canvas.unbind('<ButtonRelease-1>')
+
+    def clear_canvas(self, _event=None):
+        """
+        Clears and prepares canvas for new drawing.
+
+        :param _event: Provided by tkinter bind method. Not used.
+        """
+        self.previous_coords = None
+        for line in self.lines:
+            self.img_canvas.delete(line)
+        self.lines = []
+        self.drawn_coords = []
+
+    def mouse_draw(self, event):
+        """
+        Draws lines on image canvas and saves selected coordinates
+
+        :param event: tkinter event from bind method
+        """
+        current_coords = (event.x, event.y)
+        logger.debug([*current_coords, np.array(self.image)[current_coords[::-1]], datetime.now()])
+        if self.previous_coords is not None:
+            self.lines.append(self.img_canvas.create_line(*self.previous_coords, *current_coords,
+                                                          **self.line_parameters))
+            coords_bresenham = bresenham(self.previous_coords, current_coords)
+
+            # last item in draw_coords is previous_coords from previous iteration,
+            # so it have to be removed to avoid duplicates
+            if len(self.drawn_coords) > 0:
+                self.drawn_coords.pop()
+
+            # points are given by (x, y) but it should be reverted (y, x) for future numpy array indexing
+            coords_bresenham = [c[::-1] for c in coords_bresenham]
+            self.drawn_coords.extend(coords_bresenham)
+        else:
+            self.clear_canvas()
+
+        self.previous_coords = current_coords
+
+    def point_move(self):
+        """
+        Sets canvas drawing mode to point/line mode
+        """
+        self.clear_drawing()
+        self.img_canvas.configure(cursor='pencil')
+        self.img_canvas.bind('<Button-1>', self.mouse_draw)
+        self.img_canvas.bind('<Button-3>', self.clear_canvas)
+
+    def constant_move(self):
+        """
+        Sets canvas drawing mode to free drawing
+        """
+        self.clear_drawing()
+        self.img_canvas.configure(cursor='pencil')
+        self.img_canvas.bind('<B1-Motion>', self.mouse_draw)
+        self.img_canvas.bind('<Button-1>', self.mouse_draw)
+
+        def clear_previous_coords_when_released(_event):
+            """
+            :param _event: Provided by tkinter bind method. Not used.
+            """
+            self.previous_coords = None
+
+        # clear previous coordinates when LMB is released
+        self.img_canvas.bind('<ButtonRelease-1>', clear_previous_coords_when_released)
 
     @property
     def mode(self):
