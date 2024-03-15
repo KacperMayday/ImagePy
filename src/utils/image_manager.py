@@ -58,6 +58,7 @@ class ImageWindow(tk.Toplevel):
     """
     Main class representing window with an image. It is selectable, zoomable and has drawing functionality.
     """
+
     def __init__(self, image: Image, source_path: str | None = None):
         super().__init__()
         # image OS absolute path
@@ -66,16 +67,28 @@ class ImageWindow(tk.Toplevel):
         # make a copy of original image to prevent changing it
         self.displayed_image = copy.deepcopy(image)
         # define zoom order and possible options
-        self.zoom_options = [ZoomEnum.ZOOM_10, ZoomEnum.ZOOM_20, ZoomEnum.ZOOM_25, ZoomEnum.ZOOM_50, ZoomEnum.ZOOM_100,
-                             ZoomEnum.ZOOM_150, ZoomEnum.ZOOM_200, ZoomEnum.ZOOM_FULL]
+        self.zoom_options = [
+            ZoomEnum.ZOOM_10,
+            ZoomEnum.ZOOM_20,
+            ZoomEnum.ZOOM_25,
+            ZoomEnum.ZOOM_50,
+            ZoomEnum.ZOOM_100,
+            ZoomEnum.ZOOM_150,
+            ZoomEnum.ZOOM_200,
+            ZoomEnum.ZOOM_FULL,
+        ]
         # set default zoom
         self.current_resize = self.zoom_options.index(ZoomEnum.ZOOM_100)
         # unique window id number
         self.window_id: str = self.calculate_window_id()
-        self.default_file_name: str = 'Duplicated'
-        self._img = None  # this is needed only to keep canvas image away from garbage collector
+        self.default_file_name: str = "Duplicated"
+        self._img = (
+            None  # this is needed only to keep canvas image away from garbage collector
+        )
         self.frame = ttk.Frame(self)
-        self.img_canvas = tk.Canvas(self.frame, scrollregion=(0, 0, self.image.width, self.image.height))
+        self.img_canvas = tk.Canvas(
+            self.frame, scrollregion=(0, 0, self.image.width, self.image.height)
+        )
         self.hbar = tk.Scrollbar(self.frame, orient=tk.HORIZONTAL)
         self.hbar.pack(side=tk.BOTTOM, fill=tk.X)
         self.hbar.config(command=self.img_canvas.xview)
@@ -93,26 +106,29 @@ class ImageWindow(tk.Toplevel):
         ImageManager.add_window(self)
         # bind controls
         self.bind("<FocusIn>", lambda _: ImageManager.set_focus(self))
-        self.bind('<Destroy>', lambda _: ImageManager.delete_window(self))
-        self.bind('<Control-MouseWheel>', self.resize)
-        self.bind('<MouseWheel>', lambda e: self.img_canvas.yview_scroll(-1 * (e.delta // 120), "units"))
+        self.bind("<Destroy>", lambda _: ImageManager.delete_window(self))
+        self.bind("<Control-MouseWheel>", self.resize)
+        self.bind(
+            "<MouseWheel>",
+            lambda e: self.img_canvas.yview_scroll(-1 * (e.delta // 120), "units"),
+        )
 
         # project
         self.previous_coords = None
         self.lines = []
         self.drawn_coords = []
         # define line parameters for tk.Canvas.create_line() method
-        self.line_parameters = {'fill': '#f5e505', 'width': 2}
+        self.line_parameters = {"fill": "#f5e505", "width": 2}
 
     def clear_drawing(self):
         """
         Resets drawing state.
         """
-        self.img_canvas.configure(cursor='arrow')
+        self.img_canvas.configure(cursor="arrow")
         self.clear_canvas()
-        self.img_canvas.unbind('<B1-Motion>')
-        self.img_canvas.unbind('<Button-1>')
-        self.img_canvas.unbind('<ButtonRelease-1>')
+        self.img_canvas.unbind("<B1-Motion>")
+        self.img_canvas.unbind("<Button-1>")
+        self.img_canvas.unbind("<ButtonRelease-1>")
 
     def clear_canvas(self, _event=None):
         """
@@ -133,10 +149,19 @@ class ImageWindow(tk.Toplevel):
         :param event: tkinter event from bind method
         """
         current_coords = (event.x, event.y)
-        logger.debug([*current_coords, np.array(self.image)[current_coords[::-1]], datetime.now()])
+        logger.debug(
+            [
+                *current_coords,
+                np.array(self.image)[current_coords[::-1]],
+                datetime.now(),
+            ]
+        )
         if self.previous_coords is not None:
-            self.lines.append(self.img_canvas.create_line(*self.previous_coords, *current_coords,
-                                                          **self.line_parameters))
+            self.lines.append(
+                self.img_canvas.create_line(
+                    *self.previous_coords, *current_coords, **self.line_parameters
+                )
+            )
             coords_bresenham = bresenham(self.previous_coords, current_coords)
 
             # last item in draw_coords is previous_coords from previous iteration,
@@ -157,18 +182,18 @@ class ImageWindow(tk.Toplevel):
         Sets canvas drawing mode to point/line mode
         """
         self.clear_drawing()
-        self.img_canvas.configure(cursor='pencil')
-        self.img_canvas.bind('<Button-1>', self.mouse_draw)
-        self.img_canvas.bind('<Button-3>', self.clear_canvas)
+        self.img_canvas.configure(cursor="pencil")
+        self.img_canvas.bind("<Button-1>", self.mouse_draw)
+        self.img_canvas.bind("<Button-3>", self.clear_canvas)
 
     def constant_move(self):
         """
         Sets canvas drawing mode to free drawing
         """
         self.clear_drawing()
-        self.img_canvas.configure(cursor='pencil')
-        self.img_canvas.bind('<B1-Motion>', self.mouse_draw)
-        self.img_canvas.bind('<Button-1>', self.mouse_draw)
+        self.img_canvas.configure(cursor="pencil")
+        self.img_canvas.bind("<B1-Motion>", self.mouse_draw)
+        self.img_canvas.bind("<Button-1>", self.mouse_draw)
 
         def clear_previous_coords_when_released(_event):
             """
@@ -177,7 +202,7 @@ class ImageWindow(tk.Toplevel):
             self.previous_coords = None
 
         # clear previous coordinates when LMB is released
-        self.img_canvas.bind('<ButtonRelease-1>', clear_previous_coords_when_released)
+        self.img_canvas.bind("<ButtonRelease-1>", clear_previous_coords_when_released)
 
     @property
     def mode(self):
@@ -186,22 +211,26 @@ class ImageWindow(tk.Toplevel):
     @staticmethod
     def calculate_window_id() -> str:
         id_max_digits_length = 9
-        digits_separator = '-'
+        digits_separator = "-"
         digits_group_length = 3
-        id_number = str(int(time.time()) % 10 ** id_max_digits_length)
+        id_number = str(int(time.time()) % 10**id_max_digits_length)
 
-        id_list = [id_number[max(i - digits_group_length, 0): i]
-                   for i in range(len(id_number), 0, -digits_group_length)][::-1]
+        id_list = [
+            id_number[max(i - digits_group_length, 0) : i]
+            for i in range(len(id_number), 0, -digits_group_length)
+        ][::-1]
         window_id = digits_separator.join(id_list)
         return window_id
 
     @property
     def window_title(self) -> str:
         resize_option = self.zoom_options[self.current_resize]
-        return f'{self.window_id} ' \
-               f'{os.path.split(self.source_path)[-1] if self.source_path else self.default_file_name} ' \
-               f'{self.image.mode} ' \
-               f'{resize_option if isinstance(resize_option, str) else int(resize_option * 100)}%'
+        return (
+            f"{self.window_id} "
+            f"{os.path.split(self.source_path)[-1] if self.source_path else self.default_file_name} "
+            f"{self.image.mode} "
+            f"{resize_option if isinstance(resize_option, str) else int(resize_option * 100)}%"
+        )
 
     @window_title.setter
     def window_title(self, source_path: str | None = None):
@@ -217,9 +246,13 @@ class ImageWindow(tk.Toplevel):
         self._img = ImageTk.PhotoImage(self.displayed_image)
         self.img_canvas.config(height=self._img.height(), width=self._img.width())
         self.img_canvas.create_image(0, 0, image=self._img, anchor=tk.NW)
-        self.img_canvas.config(xscrollcommand=self.hbar.set, yscrollcommand=self.vbar.set)
+        self.img_canvas.config(
+            xscrollcommand=self.hbar.set, yscrollcommand=self.vbar.set
+        )
         self.window_title = self.source_path
-        self.img_canvas.config(scrollregion=(0, 0, self.displayed_image.width, self.displayed_image.height))
+        self.img_canvas.config(
+            scrollregion=(0, 0, self.displayed_image.width, self.displayed_image.height)
+        )
 
     def resize(self, resize_event: tk.Event):
         self.current_resize -= resize_event.delta // 120
@@ -236,7 +269,12 @@ class ImageWindow(tk.Toplevel):
             resize_scale = self.winfo_screenwidth() / self.image.width
 
         self.displayed_image = self.image.resize(
-            (round(self.image.width * resize_scale), round(self.image.height * resize_scale)), Image.ANTIALIAS)
+            (
+                round(self.image.width * resize_scale),
+                round(self.image.height * resize_scale),
+            ),
+            Image.ANTIALIAS,
+        )
         self.refresh_display_image()
 
 
@@ -257,15 +295,19 @@ class ImageManager:
 
     @staticmethod
     def delete_window(deleted_window: ImageWindow):
-        ImageManager.image_windows = [w for w in ImageManager.image_windows if w.window_id != deleted_window.window_id]
+        ImageManager.image_windows = [
+            w
+            for w in ImageManager.image_windows
+            if w.window_id != deleted_window.window_id
+        ]
 
     @staticmethod
     def get_focus_window() -> ImageWindow | None:
         focused_window = ImageManager.focused_window
         if focused_window:
-            msg = f'Window name: {focused_window.window_title} Image mode: {focused_window.mode}'
+            msg = f"Window name: {focused_window.window_title} Image mode: {focused_window.mode}"
         else:
             msg = None
 
-        logger.debug(f'Selected window: {msg}')
+        logger.debug(f"Selected window: {msg}")
         return focused_window

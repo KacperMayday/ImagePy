@@ -2,7 +2,7 @@ import logging
 
 from PIL import Image
 
-from src.utils.constants import ImageModeEnum, MAX_INTENSITY_LEVEL
+from src.utils.constants import MAX_INTENSITY_LEVEL, ImageModeEnum
 from src.utils.image_manager import ImageWindow
 
 logger = logging.getLogger(__name__)
@@ -19,9 +19,11 @@ def invert_image(image_window: ImageWindow) -> None:
         case ImageModeEnum.GREYSCALE:
             list_of_pixels = [MAX_INTENSITY_LEVEL - i for i in list_of_pixels]
         case ImageModeEnum.COLOUR:
-            list_of_pixels = [tuple([MAX_INTENSITY_LEVEL - j for j in i]) for i in list_of_pixels]
+            list_of_pixels = [
+                tuple([MAX_INTENSITY_LEVEL - j for j in i]) for i in list_of_pixels
+            ]
         case _:
-            logger.error(ValueError('Invalid image format!'))
+            logger.error(ValueError("Invalid image format!"))
 
     inverted_image = Image.new(source_image.mode, source_image.size)
     inverted_image.putdata(list_of_pixels)

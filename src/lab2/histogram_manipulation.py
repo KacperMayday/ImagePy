@@ -4,7 +4,8 @@ import tkinter as tk
 from PIL import Image
 
 from src.lab1.histogram import HistogramCanvas, HistogramWidget
-from src.utils.constants import ColourEnum, ImageModeEnum, MAX_INTENSITY_LEVEL, MIN_INTENSITY_LEVEL
+from src.utils.constants import (MAX_INTENSITY_LEVEL, MIN_INTENSITY_LEVEL,
+                                 ColourEnum, ImageModeEnum)
 from src.utils.gui.widgets import GradientBar, SliderWidget
 from src.utils.image_manager import ImageWindow
 from src.utils.utils import ColourIterator
@@ -23,7 +24,7 @@ class LinearAdjustmentWidget(tk.Toplevel):
     def __init__(self, source_image_window: ImageWindow):
         super(LinearAdjustmentWidget, self).__init__()
         self.title(source_image_window.window_title)
-        self.geometry('350x400')
+        self.geometry("350x400")
         self.pack_propagate(False)
         self.image_window = source_image_window
         self.image = source_image_window.image
@@ -31,10 +32,16 @@ class LinearAdjustmentWidget(tk.Toplevel):
         self.frame = tk.Frame(self)
 
         colour = ColourEnum.GREYSCALE
-        histogram_values = HistogramWidget.calculate_histogram_values(self.image)[colour]
-        self.histogram_canvas = HistogramCanvas(self.frame, colour, histogram_values, self.histogram_max_height)
+        histogram_values = HistogramWidget.calculate_histogram_values(self.image)[
+            colour
+        ]
+        self.histogram_canvas = HistogramCanvas(
+            self.frame, colour, histogram_values, self.histogram_max_height
+        )
         self.histogram_canvas.pack()
-        gradient_bar = GradientBar(root=self.frame, height=10, colour_iterator=ColourIterator(colour))
+        gradient_bar = GradientBar(
+            root=self.frame, height=10, colour_iterator=ColourIterator(colour)
+        )
         gradient_bar.pack()
 
         self.lower_boundary_line = self.histogram_canvas.create_line(
@@ -42,9 +49,11 @@ class LinearAdjustmentWidget(tk.Toplevel):
             self.histogram_canvas.border_offset,
             self.histogram_canvas.border_offset,
             self.histogram_max_height + self.histogram_canvas.border_offset,
-            fill='red'
+            fill="red",
         )
-        slider_lower_boundary = SliderWidget(self.frame, initial_value=MIN_INTENSITY_LEVEL)
+        slider_lower_boundary = SliderWidget(
+            self.frame, initial_value=MIN_INTENSITY_LEVEL
+        )
         self.lower_boundary_variable = slider_lower_boundary.slider_variable
         slider_lower_boundary.pack()
 
@@ -53,18 +62,27 @@ class LinearAdjustmentWidget(tk.Toplevel):
             self.histogram_canvas.border_offset,
             MAX_INTENSITY_LEVEL + self.histogram_canvas.border_offset,
             self.histogram_max_height + self.histogram_canvas.border_offset,
-            fill='red')
-        slider_higher_boundary = SliderWidget(self.frame, initial_value=MAX_INTENSITY_LEVEL)
+            fill="red",
+        )
+        slider_higher_boundary = SliderWidget(
+            self.frame, initial_value=MAX_INTENSITY_LEVEL
+        )
         self.higher_boundary_variable = slider_higher_boundary.slider_variable
         slider_higher_boundary.pack()
-        self.filters = [[self.lower_boundary_variable, 'lower'],
-                        [self.higher_boundary_variable, 'higher']]
-        self.lower_boundary_variable.trace('w', self.update_threshold)
-        self.higher_boundary_variable.trace('w', self.update_threshold)
+        self.filters = [
+            [self.lower_boundary_variable, "lower"],
+            [self.higher_boundary_variable, "higher"],
+        ]
+        self.lower_boundary_variable.trace("w", self.update_threshold)
+        self.higher_boundary_variable.trace("w", self.update_threshold)
 
-        self.reset_button = tk.Button(self.frame, text='Reset', command=self.reset_image)
+        self.reset_button = tk.Button(
+            self.frame, text="Reset", command=self.reset_image
+        )
         self.reset_button.pack()
-        self.close_button = tk.Button(self.frame, text='Apply', command=self.linear_adjustment)
+        self.close_button = tk.Button(
+            self.frame, text="Apply", command=self.linear_adjustment
+        )
         self.close_button.pack()
         self.frame.pack()
 
@@ -74,21 +92,25 @@ class LinearAdjustmentWidget(tk.Toplevel):
             for f in self.filters:
                 if var == f[0]._name:
                     active_filter = f[1]
-            if active_filter == 'higher':
+            if active_filter == "higher":
                 self.lower_boundary_variable.set(self.higher_boundary_variable.get())
-            elif active_filter == 'lower':
+            elif active_filter == "lower":
                 self.higher_boundary_variable.set(self.lower_boundary_variable.get())
 
-        self.histogram_canvas.coords(self.lower_boundary_line,
-                                     self.lower_boundary_variable.get() + self.histogram_canvas.border_offset,
-                                     self.histogram_canvas.border_offset,
-                                     self.lower_boundary_variable.get() + self.histogram_canvas.border_offset,
-                                     self.histogram_max_height + self.histogram_canvas.border_offset)
-        self.histogram_canvas.coords(self.higher_boundary_line,
-                                     self.higher_boundary_variable.get() + self.histogram_canvas.border_offset,
-                                     self.histogram_canvas.border_offset,
-                                     self.higher_boundary_variable.get() + self.histogram_canvas.border_offset,
-                                     self.histogram_max_height + self.histogram_canvas.border_offset)
+        self.histogram_canvas.coords(
+            self.lower_boundary_line,
+            self.lower_boundary_variable.get() + self.histogram_canvas.border_offset,
+            self.histogram_canvas.border_offset,
+            self.lower_boundary_variable.get() + self.histogram_canvas.border_offset,
+            self.histogram_max_height + self.histogram_canvas.border_offset,
+        )
+        self.histogram_canvas.coords(
+            self.higher_boundary_line,
+            self.higher_boundary_variable.get() + self.histogram_canvas.border_offset,
+            self.histogram_canvas.border_offset,
+            self.higher_boundary_variable.get() + self.histogram_canvas.border_offset,
+            self.histogram_max_height + self.histogram_canvas.border_offset,
+        )
 
     def reset_image(self):
         self.image_window.update_image(self.image)
@@ -97,12 +119,16 @@ class LinearAdjustmentWidget(tk.Toplevel):
 
         self.histogram_canvas.lines = []
         colour = ColourEnum.GREYSCALE
-        histogram_values = HistogramWidget.calculate_histogram_values(self.image)[colour]
+        histogram_values = HistogramWidget.calculate_histogram_values(self.image)[
+            colour
+        ]
         self.histogram_canvas.histogram_dict = histogram_values
         self.histogram_canvas.plot_histogram()
 
     @staticmethod
-    def calculate_linear_adjustment(pixel_value: int, min_out: int, max_out: int) -> int:
+    def calculate_linear_adjustment(
+        pixel_value: int, min_out: int, max_out: int
+    ) -> int:
         if pixel_value < min_out:
             return MIN_INTENSITY_LEVEL
         elif pixel_value > max_out:
@@ -111,7 +137,9 @@ class LinearAdjustmentWidget(tk.Toplevel):
             if max_out == min_out:
                 return pixel_value
 
-            return round((pixel_value - min_out) * (MAX_INTENSITY_LEVEL / (max_out - min_out)))
+            return round(
+                (pixel_value - min_out) * (MAX_INTENSITY_LEVEL / (max_out - min_out))
+            )
 
     def linear_adjustment(self, _a=None, _b=None, _c=None):
         image = self.image
@@ -123,10 +151,12 @@ class LinearAdjustmentWidget(tk.Toplevel):
         max_out = min(self.higher_boundary_variable.get(), max_in)
         match image.mode:
             case ImageModeEnum.GREYSCALE:
-                list_of_pixels = [self.calculate_linear_adjustment(i, min_out, max_out)
-                                  for i in list_of_pixels]
+                list_of_pixels = [
+                    self.calculate_linear_adjustment(i, min_out, max_out)
+                    for i in list_of_pixels
+                ]
             case _:
-                logger.error(ValueError('Invalid image format!'))
+                logger.error(ValueError("Invalid image format!"))
 
         inverted_image = Image.new(image.mode, image.size)
         inverted_image.putdata(list_of_pixels)
@@ -137,7 +167,9 @@ class LinearAdjustmentWidget(tk.Toplevel):
 
         self.histogram_canvas.lines = []
         colour = ColourEnum.GREYSCALE
-        histogram_values = HistogramWidget.calculate_histogram_values(inverted_image)[colour]
+        histogram_values = HistogramWidget.calculate_histogram_values(inverted_image)[
+            colour
+        ]
         self.histogram_canvas.histogram_dict = histogram_values
         self.histogram_canvas.plot_histogram()
 
@@ -156,14 +188,19 @@ def histogram_equalization(image_window: ImageWindow):
             for i in histogram:
                 histogram_list[i] = histogram[i]
 
-            histogram_cumulative_distributor = [sum(histogram_list[:i + 1]) for i in range(len(histogram_list))]
+            histogram_cumulative_distributor = [
+                sum(histogram_list[: i + 1]) for i in range(len(histogram_list))
+            ]
             dim = len(list_of_pixels)
             hcd_min = min(i for i in histogram_cumulative_distributor if i > 0)
             list_of_pixels = [
-                (histogram_cumulative_distributor[p] - hcd_min) * (max_intensity_level - 1) // (dim - hcd_min)
-                for p in list_of_pixels]
+                (histogram_cumulative_distributor[p] - hcd_min)
+                * (max_intensity_level - 1)
+                // (dim - hcd_min)
+                for p in list_of_pixels
+            ]
         case _:
-            logger.error(ValueError('Invalid image format!'))
+            logger.error(ValueError("Invalid image format!"))
 
     inverted_image = Image.new(image.mode, image.size)
     inverted_image.putdata(list_of_pixels)
@@ -181,7 +218,7 @@ class GammaCorrectionWidget(tk.Toplevel):
     def __init__(self, source_image_window: ImageWindow):
         super(GammaCorrectionWidget, self).__init__()
         self.title(source_image_window.window_title)
-        self.geometry('350x400')
+        self.geometry("350x400")
         self.pack_propagate(False)
         self.image_window = source_image_window
         self.image = source_image_window.image
@@ -189,30 +226,44 @@ class GammaCorrectionWidget(tk.Toplevel):
         self.frame = tk.Frame(self)
 
         colour = ColourEnum.GREYSCALE
-        histogram_values = HistogramWidget.calculate_histogram_values(self.image)[colour]
-        self.histogram_canvas = HistogramCanvas(self.frame, colour, histogram_values, self.histogram_max_height)
+        histogram_values = HistogramWidget.calculate_histogram_values(self.image)[
+            colour
+        ]
+        self.histogram_canvas = HistogramCanvas(
+            self.frame, colour, histogram_values, self.histogram_max_height
+        )
         self.histogram_canvas.pack()
-        gradient_bar = GradientBar(root=self.frame, height=10, colour_iterator=ColourIterator(colour))
+        gradient_bar = GradientBar(
+            root=self.frame, height=10, colour_iterator=ColourIterator(colour)
+        )
         gradient_bar.pack()
 
         self.percent_frame = tk.Frame(self.frame)
         tk.Label(self.percent_frame, text="Gamma coefficient: ").pack()
-        slider_percent = SliderWidget(self.percent_frame, initial_value=1, slider_length=100,
-                                      max_intensity_level=3, resolution=0.05, min_intensity_level=0.5,
-                                      tick_interval=1)
-        slider_percent.entry = tk.Entry(slider_percent,
-                                        textvariable=slider_percent.slider_variable,
-                                        width=4)
-        slider_percent.entry.grid(row=0,
-                                  column=2,
-                                  sticky='NW')
+        slider_percent = SliderWidget(
+            self.percent_frame,
+            initial_value=1,
+            slider_length=100,
+            max_intensity_level=3,
+            resolution=0.05,
+            min_intensity_level=0.5,
+            tick_interval=1,
+        )
+        slider_percent.entry = tk.Entry(
+            slider_percent, textvariable=slider_percent.slider_variable, width=4
+        )
+        slider_percent.entry.grid(row=0, column=2, sticky="NW")
         self.percent = slider_percent.slider_variable
         slider_percent.pack()
         self.percent_frame.pack()
 
-        self.reset_button = tk.Button(self.frame, text='Reset', command=self.reset_image)
+        self.reset_button = tk.Button(
+            self.frame, text="Reset", command=self.reset_image
+        )
         self.reset_button.pack()
-        self.close_button = tk.Button(self.frame, text='Apply', command=self.gamma_correction_calc)
+        self.close_button = tk.Button(
+            self.frame, text="Apply", command=self.gamma_correction_calc
+        )
         self.close_button.pack()
         self.frame.pack()
 
@@ -224,14 +275,22 @@ class GammaCorrectionWidget(tk.Toplevel):
 
         self.histogram_canvas.lines = []
         colour = ColourEnum.GREYSCALE
-        histogram_values = HistogramWidget.calculate_histogram_values(self.image)[colour]
+        histogram_values = HistogramWidget.calculate_histogram_values(self.image)[
+            colour
+        ]
         self.histogram_canvas.histogram_dict = histogram_values
         self.histogram_canvas.plot_histogram()
 
     @staticmethod
-    def calculate_gamma_adjustment(pixel_value: int, gamma_coefficient: float,
-                                   max_intensity_value: int = MAX_INTENSITY_LEVEL) -> int:
-        return round(((pixel_value / max_intensity_value) ** (1 / gamma_coefficient)) * MAX_INTENSITY_LEVEL)
+    def calculate_gamma_adjustment(
+        pixel_value: int,
+        gamma_coefficient: float,
+        max_intensity_value: int = MAX_INTENSITY_LEVEL,
+    ) -> int:
+        return round(
+            ((pixel_value / max_intensity_value) ** (1 / gamma_coefficient))
+            * MAX_INTENSITY_LEVEL
+        )
 
     def gamma_correction_calc(self, _a=None, _b=None, _c=None):
         image = self.image
@@ -240,9 +299,12 @@ class GammaCorrectionWidget(tk.Toplevel):
         list_of_pixels = list(image.getdata())
         match image.mode:
             case ImageModeEnum.GREYSCALE:
-                list_of_pixels = [self.calculate_gamma_adjustment(i, gamma_coefficient) for i in list_of_pixels]
+                list_of_pixels = [
+                    self.calculate_gamma_adjustment(i, gamma_coefficient)
+                    for i in list_of_pixels
+                ]
             case _:
-                logger.error(ValueError('Invalid image format!'))
+                logger.error(ValueError("Invalid image format!"))
 
         inverted_image = Image.new(image.mode, image.size)
         inverted_image.putdata(list_of_pixels)
@@ -253,6 +315,8 @@ class GammaCorrectionWidget(tk.Toplevel):
 
         self.histogram_canvas.lines = []
         colour = ColourEnum.GREYSCALE
-        histogram_values = HistogramWidget.calculate_histogram_values(inverted_image)[colour]
+        histogram_values = HistogramWidget.calculate_histogram_values(inverted_image)[
+            colour
+        ]
         self.histogram_canvas.histogram_dict = histogram_values
         self.histogram_canvas.plot_histogram()

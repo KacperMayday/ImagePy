@@ -8,7 +8,13 @@ logger = logging.getLogger(__name__)
 
 def create_debug_menu(menubar: Menu) -> Menu:
     debug_menu = Menu(menubar, tearoff=0)
-    debug_menu.add_command(label="Selected image", command=ImageManager.get_focus_window)
-    debug_menu.add_command(label="Image list",
-                           command=lambda: logger.debug([window.window_title for window in ImageManager.image_windows]))
+    debug_menu.add_command(
+        label="Selected image", command=ImageManager.get_focus_window
+    )
+    debug_menu.add_command(
+        label="Image list",
+        command=lambda: logger.debug(
+            [window.window_title for window in ImageManager.image_windows]
+        ),
+    )
     return debug_menu
