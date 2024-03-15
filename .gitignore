@@ -1,2 +1,4 @@
 /resources/
 /venv/
+__pycache__
+.idea
