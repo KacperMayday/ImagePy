@@ -4,8 +4,12 @@ import tkinter as tk
 from PIL import Image
 
 from src.lab1.histogram import HistogramCanvas, HistogramWidget
-from src.utils.constants import (MAX_INTENSITY_LEVEL, MIN_INTENSITY_LEVEL,
-                                 ColourEnum, ImageModeEnum)
+from src.utils.constants import (
+    MAX_INTENSITY_LEVEL,
+    MIN_INTENSITY_LEVEL,
+    ColourEnum,
+    ImageModeEnum,
+)
 from src.utils.gui.widgets import GradientBar, SliderWidget
 from src.utils.image_manager import ImageWindow
 from src.utils.utils import ColourIterator

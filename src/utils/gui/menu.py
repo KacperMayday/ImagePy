@@ -12,9 +12,11 @@ from lab6.measures import calculate_measures
 from lab_project.logic_filter import logic_filter
 from src.debug.debug import create_debug_menu
 from src.lab1.histogram import show_histogram
-from src.lab2.histogram_manipulation import (gamma_correction,
-                                             histogram_equalization,
-                                             linear_adjustment)
+from src.lab2.histogram_manipulation import (
+    gamma_correction,
+    histogram_equalization,
+    linear_adjustment,
+)
 from src.lab2.negation import invert_image
 from src.lab2.threshold import threshold_filter
 from src.lab_project.plot_profile import plot_profile, show_plot_info

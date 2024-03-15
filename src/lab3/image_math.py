@@ -5,8 +5,7 @@ from dataclasses import dataclass, fields
 from PIL import Image
 
 from lab2.histogram_manipulation import LinearAdjustmentWidget
-from utils.constants import (MAX_INTENSITY_LEVEL, MIN_INTENSITY_LEVEL,
-                             ImageModeEnum)
+from utils.constants import MAX_INTENSITY_LEVEL, MIN_INTENSITY_LEVEL, ImageModeEnum
 from utils.image_manager import ImageWindow
 
 logger = logging.getLogger(__name__)
