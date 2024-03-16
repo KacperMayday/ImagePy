@@ -1,4 +1,7 @@
 /resources/
 /venv/
+.venv
+.venv-dev
 __pycache__
 .idea
+.mypy_cache
