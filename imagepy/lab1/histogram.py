@@ -214,7 +214,7 @@ class HistogramWidget(tk.Toplevel):
                 clicked,
                 *options,
                 command=lambda _: show_frame(
-                    histogram_frames, ColorEnum(clicked.get())
+                    histogram_frames, ColorEnum(clicked.get().lower())
                 ),
             )
             drop.pack()

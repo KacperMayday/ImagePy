@@ -85,9 +85,7 @@ class ImageWindow(tk.Toplevel):
         # unique window id number
         self.window_id: str = self.calculate_window_id()
         self.default_file_name: str = "Duplicated"
-        self._img = (
-            None  # this is needed only to keep canvas image away from garbage collector
-        )
+        self._img = ImageTk.PhotoImage(self.displayed_image)
         self.widget_frame: ttk.Frame = ttk.Frame(self)
         self.img_canvas = tk.Canvas(
             self.widget_frame, scrollregion=(0, 0, self.image.width, self.image.height)
@@ -231,12 +229,16 @@ class ImageWindow(tk.Toplevel):
 
     @property
     def window_title(self) -> str:
-        resize_option = self.zoom_options[self.current_resize]
+        resize_option = self.zoom_options[self.current_resize].value
+        if isinstance(resize_option, str):
+            image_size = resize_option
+        else:
+            image_size = f"{int(resize_option * 100)}%"
         return (
             f"{self.window_id} "
             f"{os.path.split(self.source_path)[-1] if self.source_path else self.default_file_name} "
             f"{self.image.mode} "
-            f"{resize_option if isinstance(resize_option, str) else int(resize_option.value * 100)}%"
+            f"{image_size}"
         )
 
     @window_title.setter
@@ -250,7 +252,7 @@ class ImageWindow(tk.Toplevel):
         self.resize_image(resize_scale.value)
 
     def refresh_display_image(self) -> None:
-        self._img = ImageTk.PhotoImage(self.displayed_image)
+        self._img.paste(self.displayed_image)
         self.img_canvas.config(height=self._img.height(), width=self._img.width())
         self.img_canvas.create_image(0, 0, image=self._img, anchor=tk.NW)
         self.img_canvas.config(
@@ -272,7 +274,10 @@ class ImageWindow(tk.Toplevel):
         self.resize_image(resize_scale.value)
 
     def resize_image(self, resize_scale: float | Literal[ZoomEnum.ZOOM_FULL]) -> None:
-        if resize_scale == ZoomEnum.ZOOM_FULL:
+        if (
+            resize_scale == ZoomEnum.ZOOM_FULL
+            or resize_scale == ZoomEnum.ZOOM_FULL.value
+        ):
             resize_scale = self.winfo_screenwidth() / self.image.width
 
         self.displayed_image = self.image.resize(
