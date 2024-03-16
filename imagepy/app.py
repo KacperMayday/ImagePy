@@ -27,7 +27,11 @@ def setup_logging(log_level: int = logging.INFO) -> None:
     module_root_logger.setLevel(log_level)
 
 
-if __name__ == "__main__":
+def shell() -> None:
     setup_logging()
     app = App()
     app.run()
+
+
+if __name__ == "__main__":
+    shell()
