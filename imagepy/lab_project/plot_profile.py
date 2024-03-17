@@ -22,8 +22,8 @@ def show_plot_info() -> None:
     """
     Creates tutorial box for plot profile line functionality
     """
-    msg = """
-            Instructions for plotting profiles:
+    msg = """Instructions for plotting profiles:
+
 1. Draw line by selecting either Free drawing or Line drawing.
     1a. Free drawing.
         Press and hold LMB to draw line on image.
@@ -35,7 +35,7 @@ def show_plot_info() -> None:
         To erase current lines press RMB.
 2. Select Plot option to generate profile plot.
 3. To stop drawing and clear image canvas select Clear option.
-            """
+"""
     showinfo(title="Plot functionality info", message=msg)
 
 

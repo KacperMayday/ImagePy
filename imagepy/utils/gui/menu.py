@@ -1,6 +1,8 @@
 import logging
 import tkinter as tk
+from tkinter.messagebox import showinfo
 
+import imagepy
 from imagepy.debug.debug import create_debug_menu
 from imagepy.lab1.histogram import show_histogram
 from imagepy.lab2.histogram_manipulation import (
@@ -31,6 +33,23 @@ def not_implemented() -> None:
     logger.error(NotImplementedError("To be implemented..."))
 
 
+def show_app_info() -> None:
+    """
+    Creates info box about application
+    """
+    msg = f"""ImagePy
+
+Utility tool for image analysis.
+
+Version: {imagepy.__version__}
+Author: Kacper Madej (www.github.com/KacperMayday)
+Language: Python 3.12
+
+See the documentation on GitHub for more details.
+"""
+    showinfo(title="About ImagePy", message=msg)
+
+
 def create_menu(root: tk.Toplevel | tk.Tk) -> tk.Menu:
     menubar = tk.Menu(root)
     custom_font = ("", 13)
@@ -49,6 +68,10 @@ def create_menu(root: tk.Toplevel | tk.Tk) -> tk.Menu:
         command=lambda: save_file_as(ImageManager.get_focus_window()),
         font=custom_font,
     )
+
+    file_menu.add_separator()
+
+    file_menu.add_command(label="Info", command=show_app_info, font=custom_font)
 
     file_menu.add_separator()
 
