@@ -5,3 +5,6 @@
 __pycache__
 .idea
 .mypy_cache
+/build/
+/imagepy.egg-info/
+/dist/
