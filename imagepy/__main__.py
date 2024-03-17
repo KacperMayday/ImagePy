@@ -1,4 +1,4 @@
-from app import shell
+from imagepy.app import shell
 
 if __name__ == "__main__":
     shell()
