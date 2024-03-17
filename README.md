@@ -12,9 +12,8 @@ For now, application is not published on https://pypi.org/, so it has to be inst
 
 Inside your virtual environment:
 
-1. Clone the repository: `git clone https://github.com/KacperMayday/ImagePy.git`
-2. Install Python package: `pip install imagepy`
-3. Run: `imagepy`
+1. Install Python package: `pip install git+https://github.com/KacperMayday/ImagePy.git`
+2. Run: `imagepy`
 
 Check [Usage](#usage) section to see how to compile and execute application as `.exe` file.
 
@@ -31,17 +30,19 @@ want to use it, you may invoke all commands manually in your local Python enviro
 ### Compile to EXE file
 
 Compilation to executable file is done with [PyInstaller](https://pypi.org/project/pyinstaller/). Compilation
-configuration is in `imagepy/app.spec` file.
+configuration is in `ImagePy/imagepy.spec` file.
 
 #### Using make (recommended)
 
-1. Run: `make build`
-2. Compiled EXE file will be saved in newly created `dist/` directory.
+1. Clone Git repository: `git clone https://github.com/KacperMayday/ImagePy.git`
+2. Go to project root directory: `cd ImagePy`
+3. Run: `make build`
+4. Compiled EXE file will be saved in newly created `dist/` directory.
 
 #### Manual setup
 
-1. Install build dependencies: `pip install imagepy[pyinstaller]`
-2. Compile EXE file: `pyinstaller imagepy/app.spec`
+1. Install build dependencies: `pip install "imagepy[pyinstaller] @ git+https://github.com/KacperMayday/ImagePy.git"`
+2. Compile EXE file: `pyinstaller ImagePy/app.spec`
 3. Compiled EXE will be saved in newly created `dist/` directory.
 
 ### Development setup
@@ -50,8 +51,10 @@ Development setup consists of installing external dependencies, linters, pre-com
 
 #### Using make (recommended)
 
-1. Create development virtual environment: `make install-dev`
-2. Just before committing your changes run: `make lint`
+1. Clone Git repository: `git clone https://github.com/KacperMayday/ImagePy.git`
+2. Go to project root directory: `cd ImagePy`
+3. Create development virtual environment: `make install-dev`
+4. Just before committing your changes run: `make lint`
 
 ## FAQ
 
