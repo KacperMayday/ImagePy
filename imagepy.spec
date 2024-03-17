@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['imagepy\\app.py'],
+    ["imagepy/app.py"],
     pathex=[],
     binaries=[],
     datas=[],
@@ -21,7 +21,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='ImagePy',
+    name="ImagePy",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

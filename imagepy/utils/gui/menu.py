@@ -43,7 +43,7 @@ Utility tool for image analysis.
 
 Version: {imagepy.__version__}
 Author: Kacper Madej (www.github.com/KacperMayday)
-Language: Python 3.12
+Language: Python 3.11
 
 See the documentation on GitHub for more details.
 """

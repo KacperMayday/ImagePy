@@ -4,7 +4,7 @@
 
 ImagePy is a GUI utility tool for performing basic image analysis. It was developed as part of Image processing algorithms
 (pl: Algorytmy przetwarzania obrazów) subject during the third year of Computer Science
-studies. The tool is implemented in Python 3.12 with minimal external dependencies.
+studies. The tool is implemented in Python 3.11 with minimal external dependencies.
 
 ## Installation
 

@@ -1,38 +1,55 @@
 ifeq ($(OS),Windows_NT)
-    VENV_ACTIVATE := .venv\Scripts\activate
+    SUFFIX := \Scripts\activate
+    ACTIVATE_COMMAND := call
+    PYTHON_INTERPRETER := py -3.11
+    REMOVE_CMD := rd /s /q
 else
-    VENV_ACTIVATE := .venv/bin/activate
+    SUFFIX := /bin/activate
+    ACTIVATE_COMMAND := .
+    PYTHON_INTERPRETER := python3.11
+    REMOVE_CMD := rm -rf
 endif
 
-ifeq ($(OS),Windows_NT)
-    VENV_DEV_ACTIVATE := .venv-dev\Scripts\activate
-else
-    VENV_DEV_ACTIVATE := .venv-dev/bin/activate
-endif
+define activate_env
+    $(ACTIVATE_COMMAND) $1$(SUFFIX)
+endef
 
-.PHONY: install install-dev lint exec
-
+USER_VENV := .venv
+VENV_ACTIVATE := $(USER_VENV)$(SUFFIX)
+DEV_VENV := .venv-dev
+DEV_VENV_ACTIVATE := $(DEV_VENV)$(SUFFIX)
+EXE_VENV := .venv-exe
 SOURCE_DIRS := imagepy
-MYPY_ARGS := --install-types --non-interactive --check-untyped-defs --disallow-untyped-defs --disallow-incomplete-defs --check-untyped-defs
+MYPY_ARGS := --install-types --non-interactive
 
-$(VENV_ACTIVATE): requirements.txt .pre-commit-config.yaml
-	python3.11 -m venv .venv
-	. $(VENV_ACTIVATE) && pip install --upgrade pip==24.0 \
-		&& pip install -r requirements.txt
+.PHONY: install install-dev lint build clean
+
+$(VENV_ACTIVATE): pyproject.toml .pre-commit-config.yaml
+	$(PYTHON_INTERPRETER) -m venv $(USER_VENV)
+	$(call activate_env, $(USER_VENV)) && pip install --upgrade pip==24.0 \
+		&& pip install .
 
 install: $(VENV_ACTIVATE)
 
-$(VENV_DEV_ACTIVATE):
-	python3.11 -m venv .venv-dev
-	. $(VENV_DEV_ACTIVATE) && pip install --upgrade pip==24.0 \
-		&& pip install -r requirements.txt
-	. $(VENV_DEV_ACTIVATE) && pip install -r requirements-dev.txt \
+$(DEV_VENV_ACTIVATE): pyproject.toml .pre-commit-config.yaml
+	$(PYTHON_INTERPRETER) -m venv $(DEV_VENV)
+	$(call activate_env, $(DEV_VENV)) && pip install --upgrade pip==24.0 \
+		&& pip install .[dev] \
 		&& pre-commit install
 
-install-dev: $(VENV_DEV_ACTIVATE)
+install-dev: $(DEV_VENV_ACTIVATE)
 
-lint: install-dev
-	. $(VENV_DEV_ACTIVATE) && black $(SOURCE_DIRS) && mypy $(SOURCE_DIRS) $(MYPY_ARGS)
+lint: $(DEV_VENV_ACTIVATE)
+	$(call activate_env, $(DEV_VENV)) && black $(SOURCE_DIRS) && mypy $(SOURCE_DIRS) $(MYPY_ARGS)
 
-exec: install-dev
-	APO\venv\Scripts\pyinstaller.exe --onefile APO\src\app.py
+build:
+	$(PYTHON_INTERPRETER) -m venv $(EXE_VENV)
+	$(call activate_env, $(EXE_VENV)) \
+		&& pip install --upgrade pip==24.0 \
+		&& pip install .[pyinstaller]
+	$(call activate_env, $(EXE_VENV)) \
+		&& pyinstaller imagepy.spec
+	$(REMOVE_CMD) $(EXE_VENV)
+
+clean:
+	$(REMOVE_CMD) $(EXE_VENV) $(USER_VENV) $(DEV_VENV) build dist imagepy.egg-info

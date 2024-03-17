@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 dynamic = ["version"]
 name = "imagepy"
-requires-python = ">= 3.12"
+requires-python = ">= 3.11"
 dependencies = [
     "Pillow==10.2.0",
     "opencv-python==4.9.0.80",
@@ -25,7 +25,7 @@ classifiers = [
     "Operating System :: OS Independent",
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
-    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.11",
     "Intended Audience :: End Users/Desktop",
     "Intended Audience :: Education",
     "Topic :: Education",
@@ -59,3 +59,15 @@ version = { attr = "imagepy.__version__" }
 
 [tool.setuptools.packages.find]
 include = ["imagepy*"]
+
+[tool.mypy]
+files = ["imagepy"]
+python_version = "3.11"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+strict_optional = true
+allow_untyped_globals = false
+allow_redefinition = false

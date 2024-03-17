@@ -1,6 +1,7 @@
 /resources/
 /venv/
 .venv
+.venv-exe
 .venv-dev
 __pycache__
 .idea
