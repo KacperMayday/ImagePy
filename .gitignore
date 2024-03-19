@@ -1,2 +1,11 @@
 /resources/
 /venv/
+.venv
+.venv-exe
+.venv-dev
+__pycache__
+.idea
+.mypy_cache
+/build/
+/imagepy.egg-info/
+/dist/
